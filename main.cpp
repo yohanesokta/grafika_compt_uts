@@ -131,7 +131,7 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
-float random() {
+float frandom() {
     return (float) rand() / (float)RAND_MAX;
 }
 
@@ -145,7 +145,7 @@ void reInitMaze(){
     srand(time(NULL));
     initMaze(&maze);
     divide(&maze, 0, 0, WIDTH, HEIGHT);
-    c_nim = { random() * (float)((WIDTH * CELL_SIZE) - 4.2), random() * (float)((HEIGHT * CELL_SIZE) - 4.2) };
+    c_nim = { frandom() * (float)((WIDTH * CELL_SIZE) - 4.2), frandom() * (float)((HEIGHT * CELL_SIZE) - 4.2) };
     glutDisplayFunc(display);
     glutPostRedisplay();
 }
