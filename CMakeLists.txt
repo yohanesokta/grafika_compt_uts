@@ -22,7 +22,6 @@ find_package(GLUT REQUIRED)
 add_executable(main 
     main.cpp
     src/maze.cpp
-    src/keyboard.h
 )
 
 target_include_directories(main PRIVATE src)

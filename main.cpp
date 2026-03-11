@@ -12,8 +12,7 @@
 #endif
 
 #include <time.h>
-#include <maze.h>
-#include <keyboard.h>
+#include "maze.h"
 #include <stdio.h>
 
 Maze maze;
@@ -51,6 +50,9 @@ void display()
     glColor3f(1.0, 0.0, 0.0);
     glRectf(player.x * CELL_SIZE, player.y * CELL_SIZE,(player.x + 1) * CELL_SIZE, (player.y + 1) * CELL_SIZE);
 
+
+    
+
     glFlush();
 }
 
@@ -75,6 +77,7 @@ float speed = 0.2;
 
 void keyboard(unsigned char key, int x, int y)
 {
+    printf("Key Pressed : %u \n",key);
     switch (key)
     {
     case 27:
