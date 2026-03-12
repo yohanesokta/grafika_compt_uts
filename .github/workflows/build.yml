@@ -45,6 +45,8 @@ jobs:
           ./linuxdeploy-x86_64.AppImage \
             --appdir AppDir \
             --executable AppDir/usr/bin/main \
+            --desktop-file resource/maze.desktop \
+            --icon-file resource/maze.png \
             --output appimage
 
       - name: Upload artifacts
