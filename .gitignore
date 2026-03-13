@@ -1,0 +1,17 @@
+# Visual Studio temporary files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sdf
+*.ipch
+*.VC.db
+*.VC.VC.opendb
+
+# Build output
+bin/
+obj/
+Debug/
+Release/
+x64/Debug/
+x64/Release/
