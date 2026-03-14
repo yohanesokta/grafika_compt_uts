@@ -26,8 +26,7 @@ struct  movement
 
 void reInitMaze();
 
-int scene = 0;
-movement player;
+movement player {0.0, 0.0};
 movement c_nim {1.0,1.0};
 
 void display()
@@ -55,38 +54,44 @@ void display()
 
     glColor3f(0.0,0.0,0.0);
     
-    glRectf(c_nim.x + 0.3, c_nim.y+0.0, c_nim.x + 0.8, c_nim.y + 0.2); 
-    glRectf(c_nim.x + 0.0, c_nim.y+0.0, c_nim.x + 0.2, c_nim.y + 0.5); 
-    // glRectf(c_nim.x + 0.3, c_nim.y+0.5, c_nim.x + 0.8, c_nim.y + 0.7);
-    glRectf(c_nim.x + 0.0, c_nim.y+0.7, c_nim.x + 0.2, c_nim.y + 1.2); 
-    glRectf(c_nim.x + 0.3, c_nim.y+1.0, c_nim.x + 0.8, c_nim.y + 1.2); 
-    glRectf(c_nim.x + 0.9, c_nim.y+0.0, c_nim.x + 1.1, c_nim.y + 0.5); 
-    glRectf(c_nim.x + 0.9, c_nim.y+0.7, c_nim.x + 1.1, c_nim.y + 1.2); 
+    float scale = 0.5;
+    float baseX = c_nim.x * CELL_SIZE + CELL_SIZE/2;
+    float baseY = c_nim.y * CELL_SIZE + CELL_SIZE/2;
 
-    // glRectf(c_nim.x + 1.4 + 0.3, c_nim.y+0.0, c_nim.x + 1.4 + 0.8, c_nim.y + 0.2); 
-    // glRectf(c_nim.x + 1.4 + 0.0, c_nim.y+0.0, c_nim.x + 1.4 + 0.2, c_nim.y + 0.5);
-    // glRectf(c_nim.x + 1.4 + 0.3, c_nim.y+0.5, c_nim.x + 1.4 + 0.8, c_nim.y + 0.7);
-    // glRectf(c_nim.x + 1.4 + 0.0, c_nim.y+0.7, c_nim.x + 1.4 + 0.2, c_nim.y + 1.2);
-    glRectf(c_nim.x + 1.4 + 0.3, c_nim.y+1.0, c_nim.x + 1.4 + 0.8, c_nim.y + 1.2);
-    glRectf(c_nim.x + 1.4 + 0.9, c_nim.y+0.0, c_nim.x + 1.4 + 1.1, c_nim.y + 0.5);
-    glRectf(c_nim.x + 1.4 + 0.9, c_nim.y+0.7, c_nim.x + 1.4 + 1.1, c_nim.y + 1.2);
+    // angka 0
+    glRectf(baseX + (-1.8)*scale, baseY + (1.6)*scale, baseX + (-1.0)*scale, baseY + (1.8)*scale);
+    glRectf(baseX + (-1.8)*scale, baseY + (-1.8)*scale, baseX + (-1.0)*scale, baseY + (-1.6)*scale);
+    glRectf(baseX + (-1.8)*scale, baseY + (-1.6)*scale, baseX + (-1.6)*scale, baseY + (1.6)*scale);
+    glRectf(baseX + (-1.2)*scale, baseY + (-1.6)*scale, baseX + (-1.0)*scale, baseY + (1.6)*scale);
 
-    glRectf(c_nim.x + 2.8 + 0.3, c_nim.y+0.0, c_nim.x + 2.8 + 0.8, c_nim.y + 0.2); 
-    glRectf(c_nim.x + 2.8 + 0.0, c_nim.y+0.0, c_nim.x + 2.8 + 0.2 , c_nim.y + 0.5); 
-    glRectf(c_nim.x + 2.8 + 0.3, c_nim.y+0.5, c_nim.x + 2.8 + 0.8, c_nim.y + 0.7); 
-    glRectf(c_nim.x + 2.8 + 0.0, c_nim.y+0.7, c_nim.x + 2.8 + 0.2, c_nim.y + 1.2); 
-    glRectf(c_nim.x + 2.8 + 0.3, c_nim.y+1.0, c_nim.x + 2.8 + 0.8 + 0.2, c_nim.y + 1.2); 
-    glRectf(c_nim.x + 2.8 + 0.9, c_nim.y+0.0, c_nim.x + 2.8 + 1.1, c_nim.y + 0.5);
-    // glRectf(c_nim.x + 2.8 + 0.9, c_nim.y+0.7, c_nim.x + 2.8 + 1.1, c_nim.y + 1.2); 
+    // angka 7
+    glRectf(baseX + (-0.8)*scale, baseY + (1.6)*scale, baseX + (0.6)*scale, baseY + (1.8)*scale);
 
+    glBegin(GL_POLYGON);
+    glVertex2f(baseX + (-0.8)*scale, baseY + (-1.8)*scale);
+    glVertex2f(baseX + (-0.6)*scale, baseY + (-1.8)*scale);
+    glVertex2f(baseX + (0.6)*scale, baseY + (1.6)*scale);
+    glVertex2f(baseX + (0.4)*scale, baseY + (1.6)*scale);
+    glEnd();
 
-    
+    // angka 6
+    glRectf(baseX + (0.8)*scale, baseY + (1.6)*scale, baseX + (1.8)*scale, baseY + (1.8)*scale);
+    glRectf(baseX + (0.8)*scale, baseY + (-1.8)*scale, baseX + (1.0)*scale, baseY + (1.6)*scale);
+    glRectf(baseX + (1.0)*scale, baseY + (-1.8)*scale, baseX + (1.8)*scale, baseY + (-1.6)*scale);
+    glRectf(baseX + (1.6)*scale, baseY + (-1.6)*scale, baseX + (1.8)*scale, baseY + (0.0)*scale);
+    glRectf(baseX + (1.0)*scale, baseY + (-0.2)*scale, baseX + (1.6)*scale, baseY + (0.0)*scale);
+
+    // glRectf(c_nim.x + 0.0, c_nim.y+0.0, c_nim.x + 0.5, c_nim.y + 0.2);
 
     glFlush();
 }
 
 void myinit()
 {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_POLYGON_SMOOTH);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, WIDTH * CELL_SIZE, 0, HEIGHT * CELL_SIZE);
@@ -131,21 +136,31 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
-float frandom() {
-    return (float) rand() / (float)RAND_MAX;
+float randomFloat() {
+    return (float)rand() / RAND_MAX;
 }
 
 void reInitMaze(){
-    if (scene %2 == 0){
-        player = {(WIDTH)/2,HEIGHT-1};
-    } else {
-        player = {(WIDTH)/2,0};
-    }
-    scene += 1;
     srand(time(NULL));
+
     initMaze(&maze);
     divide(&maze, 0, 0, WIDTH, HEIGHT);
-    c_nim = { frandom() * (float)((WIDTH * CELL_SIZE) - 4.2), frandom() * (float)((HEIGHT * CELL_SIZE) - 4.2) };
+
+    int x,y;
+
+    do{
+        x = rand() % WIDTH;
+        y = rand() % HEIGHT;
+    }
+    while(
+        maze.grid[y][x].wall ||
+        x == 0 || x == WIDTH-1 ||
+        y == 0 || y == HEIGHT-1
+    );
+
+    c_nim.x = x;
+    c_nim.y = y;
+
     glutDisplayFunc(display);
     glutPostRedisplay();
 }
