@@ -26,7 +26,7 @@ struct  movement
 
 void reInitMaze();
 
-movement player {0.0, 0.0};
+movement player {(float)(WIDTH/2), (float)(HEIGHT-1)};
 movement c_nim {1.0,1.0};
 
 void display()
@@ -130,7 +130,8 @@ void keyboard(unsigned char key, int x, int y)
     case 100:
         movement_handler(speed,0);
         break;
-    case 99:
+    case 'c':
+    case 'C':
         reInitMaze();
         break;
     }
