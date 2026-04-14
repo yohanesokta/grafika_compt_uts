@@ -133,7 +133,7 @@ void movement_handler(float dx, float dy) {
     glutPostRedisplay();
 }
 
-float speed = 0.2;
+float speed = 0.2f;
 
 const int KEY_ESC = 27;
 // Input keyboard
@@ -145,23 +145,23 @@ void keyboard(unsigned char key, int x, int y)
     }
     switch (key)
     {
-    case 'w': // w (atas)
+    case 'w':
         movement_handler(0,speed);
         break;
 
-    case 'a': // a (kiri)
+    case 'a':
         movement_handler(-speed,0);
         break;
 
-    case 's': // s (bawah)
+    case 's':
         movement_handler(0,-speed);
         break;
 
-    case 'd': // d (kanan)
+    case 'd':
         movement_handler(speed,0);
         break;
 
-    case 'c': // refresh maze
+    case 'c':
     case 'C':
         reInitMaze();
         break;
