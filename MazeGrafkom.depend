@@ -253,7 +253,7 @@
 	<_mingw.h>
 	<stddef.h>
 
-1776172040 c:\users\yohanesoktanio\documents\code\grafikal programming\mazegrafkom\maze.h
+1776178349 c:\users\yohanesoktanio\documents\code\grafikal programming\mazegrafkom\maze.h
 
 1341006776 c:\program files (x86)\codeblocks\mingw\include\stdio.h
 	<_mingw.h>
@@ -261,7 +261,7 @@
 	<stdarg.h>
 	<sys/types.h>
 
-1776172059 source:c:\users\yohanesoktanio\documents\code\grafikal programming\mazegrafkom\maze.cpp
+1776178301 source:c:\users\yohanesoktanio\documents\code\grafikal programming\mazegrafkom\maze.cpp
 	<stdio.h>
 	<stdlib.h>
 	"maze.h"
