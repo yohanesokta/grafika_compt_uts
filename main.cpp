@@ -24,7 +24,6 @@ struct movement
     float y;
 };
 
-
 void reInitMaze();
 
 // Posisi player (mulai di tengah atas)
@@ -76,13 +75,7 @@ void display()
     
     // angka 7
     glRectf(baseX + (-0.8)*scale, baseY + (1.6)*scale, baseX + (0.6)*scale, baseY + (1.8)*scale);
-    
-    glBegin(GL_POLYGON);
-    glVertex2f(baseX + (-0.8)*scale, baseY + (-1.8)*scale);
-    glVertex2f(baseX + (-0.6)*scale, baseY + (-1.8)*scale);
-    glVertex2f(baseX + (0.6)*scale, baseY + (1.6)*scale);
-    glVertex2f(baseX + (0.4)*scale, baseY + (1.6)*scale);
-    glEnd();
+    glRectf(baseX + (0.4)*scale, baseY + (-1.8)*scale, baseX + (0.6)*scale, baseY + (1.8)*scale);
     
     // angka 6
     glRectf(baseX + (0.8)*scale, baseY + (1.6)*scale, baseX + (1.8)*scale, baseY + (1.8)*scale);
