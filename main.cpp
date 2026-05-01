@@ -157,6 +157,19 @@ void drawWall3D(float x, float z, float h, bool isPlayer)
         glVertex3f(x0+s,0,z0+s);
         glVertex3f(x0+s,h,z0+s);
         glVertex3f(x0+s,h,z0);
+        // BELAKANG
+        glColor3f(0.8, 0.0, 0.0);
+        glVertex3f(x0,0,z0);
+        glVertex3f(x0+s,0,z0);
+        glVertex3f(x0+s,h,z0);
+        glVertex3f(x0,h,z0);
+
+        // KIRI
+        glColor3f(0.7, 0.0, 0.0);
+        glVertex3f(x0,0,z0);
+        glVertex3f(x0,0,z0+s);
+        glVertex3f(x0,h,z0+s);
+        glVertex3f(x0,h,z0);
     }
     else
     {
@@ -258,7 +271,17 @@ void movement_handler(float dx, float dy) {
 
     //7
     // cek apakah nabrak tembok
-    if (!isWall(nx, ny)) {
+    float margin = 0.05f; // sedikit offset agar tidak nyangkut di tepi
+    float size   = 1.0f - margin * 2; // ukuran efektif player
+
+    // Cek 4 sudut bounding box player
+    bool blocked =
+        isWall(nx + margin,        ny + margin)        || // kiri-atas
+        isWall(nx + margin + size, ny + margin)        || // kanan-atas
+        isWall(nx + margin,        ny + margin + size) || // kiri-bawah
+        isWall(nx + margin + size, ny + margin + size);   // kanan-bawah
+
+    if (!blocked) {
         player.x = nx;
         player.y = ny;
     }
