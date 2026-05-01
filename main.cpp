@@ -306,8 +306,9 @@ void keyboard(unsigned char key, int x, int y)
         exit(0);
         break;
 
+    //19
     case 119: // w (atas)
-        movement_handler(0,speed);
+        movement_handler(0,-speed);
         break;
 
     case 97: // a (kiri)
@@ -315,7 +316,7 @@ void keyboard(unsigned char key, int x, int y)
         break;
 
     case 115: // s (bawah)
-        movement_handler(0,-speed);
+        movement_handler(0,speed);
         break;
 
     case 100: // d (kanan)
