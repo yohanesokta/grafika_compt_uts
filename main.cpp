@@ -17,6 +17,119 @@
 //18
 #include <math.h>
 
+
+// karena C++ jadi ribet, karena g mau ribet, jadi pake enum
+enum Color {
+    RED,
+    GREEN,
+    BLUE,
+    CYAN,
+    MAGENTA,
+    YELLOW,
+    WHITE,
+    BLACK
+};
+
+// setting warna, biar g capek - capek ngubah - ngubah float
+void setColor(Color c)
+{
+    switch(c)
+    {
+        case RED:
+            glColor3f(1.0, 0.0, 0.0);
+            break;
+
+        case GREEN:
+            glColor3f(0.0, 1.0, 0.0);
+            break;
+
+        case BLUE:
+            glColor3f(0.0, 0.0, 1.0);
+            break;
+
+        case CYAN:
+            glColor3f(0.0, 1.0, 1.0);
+            break;
+
+        case MAGENTA:
+            glColor3f(1.0, 0.0, 1.0);
+            break;
+
+        case YELLOW:
+            glColor3f(1.0, 1.0, 0.0);
+            break;
+
+        case WHITE:
+            glColor3f(1.0, 1.0, 1.0);
+            break;
+
+        case BLACK:
+            glColor3f(0.0, 0.0, 0.0);
+            break;
+    }
+}
+
+// 12 parameter, sekaligus setting warna per sisi, lebih fleksibel + karena malas
+void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAtas, float zAtas,
+                Color depan, Color belakang, Color kanan, Color kiri, Color atas, Color bawah 
+    ) {
+    //depan
+    setColor(depan);
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xAtas, yAtas, zBawah);
+    glVertex3f(xAtas, yBawah, zBawah);
+    glEnd();
+
+    //belakang
+    setColor(belakang);
+    glBegin(GL_POLYGON);
+    glVertex3f(xAtas, yAtas, zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glEnd();
+
+    //kiri
+    setColor(kiri);
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glEnd();
+
+    //kanan
+    setColor(kanan);
+    glBegin(GL_POLYGON);
+    glVertex3f(xAtas, yBawah, zBawah);
+    glVertex3f(xAtas, yAtas, zBawah);
+    glVertex3f(xAtas, yAtas, zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+    glEnd();
+
+    //bawah
+    setColor(bawah);
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+    glVertex3f(xAtas, yBawah, zBawah);
+    glEnd();
+
+    // //atas
+    setColor(atas);
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glVertex3f(xAtas, yAtas, zAtas);
+    glVertex3f(xAtas, yAtas, zBawah);
+    glEnd();
+
+    glFlush();
+}
+
 Maze maze; // variabel global maze
 bool is3D = false; //1
 //15
@@ -74,11 +187,39 @@ void display()
                 }
             }
         }
+        //NIM (jangan dihapus goblok)
+        glColor3f(0.0,0.0,0.0);
+
+        float scale = 0.5;
+
+        // Posisi tengah angka
+        float baseX = c_nim.x * CELL_SIZE + CELL_SIZE/2;
+        float baseY = c_nim.y * CELL_SIZE + CELL_SIZE/2;
+
+        // Gambar angka "076" (menggunakan GL_POLYGON / GLRectf)
+        
+        // angka 0
+        glRectf(baseX + (-1.8)*scale, baseY + (1.6)*scale, baseX + (-1.0)*scale, baseY + (1.8)*scale);
+        glRectf(baseX + (-1.8)*scale, baseY + (-1.8)*scale, baseX + (-1.0)*scale, baseY + (-1.6)*scale);
+        glRectf(baseX + (-1.8)*scale, baseY + (-1.6)*scale, baseX + (-1.6)*scale, baseY + (1.6)*scale);
+        glRectf(baseX + (-1.2)*scale, baseY + (-1.6)*scale, baseX + (-1.0)*scale, baseY + (1.6)*scale);
+        
+        // angka 7
+        glRectf(baseX + (-0.8)*scale, baseY + (1.6)*scale, baseX + (0.6)*scale, baseY + (1.8)*scale);
+        glRectf(baseX + (0.4)*scale, baseY + (-1.8)*scale, baseX + (0.6)*scale, baseY + (1.6)*scale);
+        
+        // angka 6
+        glRectf(baseX + (0.8)*scale, baseY + (1.6)*scale, baseX + (1.8)*scale, baseY + (1.8)*scale);
+        glRectf(baseX + (0.8)*scale, baseY + (-1.8)*scale, baseX + (1.0)*scale, baseY + (1.6)*scale);
+        glRectf(baseX + (1.0)*scale, baseY + (-1.8)*scale, baseX + (1.8)*scale, baseY + (-1.6)*scale);
+        glRectf(baseX + (1.6)*scale, baseY + (-1.6)*scale, baseX + (1.8)*scale, baseY + (0.0)*scale);
+        glRectf(baseX + (1.0)*scale, baseY + (-0.2)*scale, baseX + (1.6)*scale, baseY + (0.0)*scale);
 
         // PLAYER
         glColor3f(1.0, 0.0, 0.0);
-        glRectf(player.x * CELL_SIZE, player.y * CELL_SIZE,
-                (player.x + 1) * CELL_SIZE, (player.y + 1) * CELL_SIZE);
+        glRectf(player.x * CELL_SIZE, player.y * CELL_SIZE,(player.x + 1) * CELL_SIZE, (player.y + 1) * CELL_SIZE);
+
+        glFlush();
     }
     else
     {
@@ -118,6 +259,65 @@ void display()
             }
         }
 
+        //NIM (jangan dihapus goblok)
+        glColor3f(0.0,0.0,0.0);
+
+        float scale = 0.5;
+
+        // Posisi tengah angka
+        float baseX = c_nim.x * CELL_SIZE + CELL_SIZE/2;
+        float baseZ = c_nim.y * CELL_SIZE + CELL_SIZE/2;
+
+        // angka 0
+        buildbox(baseX + (-1.8)*scale, 1, baseZ + (1.6)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (1.8)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        buildbox(baseX + (-1.8)*scale, 1, baseZ + (-1.8)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (-1.6)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        buildbox(baseX + (-1.8)*scale, 1, baseZ + (-1.6)*scale, baseX + (-1.6)*scale, 1.5, baseZ + (1.6)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        buildbox(baseX + (-1.2)*scale, 1, baseZ + (-1.6)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (1.6)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        
+        // angka 7
+        buildbox(baseX + (-0.8)*scale, 1, baseZ + (1.6)*scale, baseX + (0.6)*scale, 1.5, baseZ + (1.8)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        buildbox(baseX + (0.4)*scale, 1, baseZ + (-1.8)*scale, baseX + (0.6)*scale, 1.5, baseZ + (1.6)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        
+        // angka 6
+        buildbox(baseX + (0.8)*scale, 1, baseZ + (1.6)*scale, baseX + (1.8)*scale, 1.5, baseZ + (1.8)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        buildbox(baseX + (0.8)*scale, 1, baseZ + (-1.8)*scale, baseX + (1.0)*scale, 1.5, baseZ + (1.6)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        buildbox(baseX + (1.0)*scale, 1, baseZ + (-1.8)*scale, baseX + (1.8)*scale, 1.5, baseZ + (-1.6)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        buildbox(baseX + (1.6)*scale, 1, baseZ + (-1.6)*scale, baseX + (1.8)*scale, 1.5, baseZ + (0.0)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+        buildbox(baseX + (1.0)*scale, 1, baseZ + (-0.2)*scale, baseX + (1.6)*scale, 1.5, baseZ + (0.0)*scale,
+            BLACK,BLACK,BLACK,
+            BLACK,BLACK,BLACK
+        );
+
         // PLAYER
         drawWall3D(player.x, player.y, 1.5f, true);
     }
@@ -130,87 +330,38 @@ void drawWall3D(float x, float z, float h, bool isPlayer)
 {
     float x0 = x * CELL_SIZE;
     float z0 = z * CELL_SIZE;
-    float s = CELL_SIZE;
-
-    glBegin(GL_QUADS);
+    float s  = CELL_SIZE;
 
     if (isPlayer)
     {
-        // 🔴 PLAYER (merah)
-        // ATAS
-        glColor3f(1.0, 0.3, 0.3);
-        glVertex3f(x0, h, z0);
-        glVertex3f(x0+s, h, z0);
-        glVertex3f(x0+s, h, z0+s);
-        glVertex3f(x0, h, z0+s);
+        // PLAYER ANOMALI
+        buildbox(
+            x0, 0.0, z0,
+            x0 + s, h, z0 + s,
 
-        // DEPAN
-        glColor3f(0.9, 0.0, 0.0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0,h,z0+s);
-
-        // KANAN
-        glColor3f(0.6, 0.0, 0.0);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0+s,h,z0);
-        // BELAKANG
-        glColor3f(0.8, 0.0, 0.0);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,h,z0);
-        glVertex3f(x0,h,z0);
-
-        // KIRI
-        glColor3f(0.7, 0.0, 0.0);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0,h,z0+s);
-        glVertex3f(x0,h,z0);
+            RED,       // depan
+            RED,       // belakang
+            RED,       // kanan
+            RED,       // kiri
+            RED,       // atas
+            RED        // bawah
+        );
     }
     else
     {
-        // 🔵 WALL (biru)
-        // ATAS
-        glColor3f(0.4, 0.7, 1.0);
-        glVertex3f(x0, h, z0);
-        glVertex3f(x0+s, h, z0);
-        glVertex3f(x0+s, h, z0+s);
-        glVertex3f(x0, h, z0+s);
+        // TEMBOK
+        buildbox(
+            x0, 0.0, z0,
+            x0 + s, h, z0 + s,
 
-        // DEPAN
-        glColor3f(0.2, 0.5, 1.0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0,h,z0+s);
-
-        // KANAN
-        glColor3f(0.1, 0.3, 0.8);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0+s,h,z0);
-
-        // BELAKANG
-        glColor3f(0.15, 0.4, 0.9);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,h,z0);
-        glVertex3f(x0,h,z0);
-
-        // KIRI
-        glColor3f(0.1, 0.35, 0.85);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0,h,z0+s);
-        glVertex3f(x0,h,z0);
+            MAGENTA,    // depan
+            GREEN,      // belakang
+            YELLOW,     // kanan
+            CYAN,       // kiri
+            BLUE,       // atas
+            WHITE       // bawah
+        );
     }
-
-    glEnd();
 }
 //5
 void drawFloor3D()
@@ -218,7 +369,7 @@ void drawFloor3D()
     float w = WIDTH * CELL_SIZE;
     float d = HEIGHT * CELL_SIZE;
 
-    glColor3f(0.7, 0.7, 0.7); // abu terang
+    glColor4f(0.0, 0.0, 0.5, 0.2); // abu terang
 
     glBegin(GL_QUADS);
     glVertex3f(0,0,0);
@@ -306,7 +457,6 @@ void keyboard(unsigned char key, int x, int y)
         exit(0);
         break;
 
-    //19
     case 119: // w (atas)
         movement_handler(0,-speed);
         break;
@@ -328,7 +478,6 @@ void keyboard(unsigned char key, int x, int y)
         reInitMaze();
         break;
 
-    //8
     case 'v':
     case 'V':
         is3D = !is3D;
@@ -339,7 +488,7 @@ void keyboard(unsigned char key, int x, int y)
     case 'i': case 'I': rotX -= 5.0f; break;
     case 'k': case 'K': rotX += 5.0f; break;
     }
-    //17
+
     if (rotY > 360.0f) rotY -= 360.0f;
     if (rotY < 0.0f)   rotY += 360.0f;
     glutPostRedisplay();
