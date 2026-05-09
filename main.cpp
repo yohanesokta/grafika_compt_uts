@@ -36,8 +36,14 @@ void reInitMaze();
 void drawWall3D(float x, float z, float h, bool isPlayer);
 void drawFloor3D();
 
+//25
+void drawSegment(float x1, float y1, float x2, float y2, float thick);
+void drawDigit7Seg(int digit, float ox, float oy, float w, float h, float thick);
+void drawNIM2D();
+
 // Posisi player (mulai di tengah atas)
-movement player {(float)(WIDTH/2), (float)(HEIGHT-1)};
+//26
+movement player {(float)(WIDTH/2), 0.0f};
 
 // Posisi angka (nim)
 movement c_nim {1.0,1.0};
@@ -79,6 +85,9 @@ void display()
         glColor3f(1.0, 0.0, 0.0);
         glRectf(player.x * CELL_SIZE, player.y * CELL_SIZE,
                 (player.x + 1) * CELL_SIZE, (player.y + 1) * CELL_SIZE);
+
+        //24
+        drawNIM2D();
     }
     else
     {
@@ -187,35 +196,35 @@ void drawWall3D(float x, float z, float h, bool isPlayer)
         glVertex3f(x0, h, z0+s);
 
         // DEPAN
-        glColor3f(0.2, 0.5, 1.0);
+        glColor3f(0.8, 0.0, 0.0);
         glVertex3f(x0,0,z0+s);
         glVertex3f(x0+s,0,z0+s);
         glVertex3f(x0+s,h,z0+s);
         glVertex3f(x0,h,z0+s);
 
         // KANAN
-        glColor3f(0.1, 0.3, 0.8);
+        glColor3f(0.8, 0.0, 0.0);
         glVertex3f(x0+s,0,z0);
         glVertex3f(x0+s,0,z0+s);
         glVertex3f(x0+s,h,z0+s);
         glVertex3f(x0+s,h,z0);
 
         // BELAKANG
-        glColor3f(0.15, 0.4, 0.9);
+        glColor3f(0.8, 0.0, 0.0);
         glVertex3f(x0,0,z0);
         glVertex3f(x0+s,0,z0);
         glVertex3f(x0+s,h,z0);
         glVertex3f(x0,h,z0);
 
         // KIRI
-        glColor3f(0.1, 0.35, 0.85);
+        glColor3f(0.8, 0.0, 0.0);
         glVertex3f(x0,0,z0);
         glVertex3f(x0,0,z0+s);
         glVertex3f(x0,h,z0+s);
         glVertex3f(x0,h,z0);
 
         // BAWAH
-        glColor3f(0.2, 0.4, 0.9);
+        glColor3f(0.8, 0.4, 0.9);
         glVertex3f(x0, 0, z0);
         glVertex3f(x0+s, 0, z0);
         glVertex3f(x0+s, 0, z0+s);
@@ -230,15 +239,76 @@ void drawFloor3D()
     float w = WIDTH * CELL_SIZE;
     float d = HEIGHT * CELL_SIZE;
 
-    glColor4f(0.7, 0.7, 0.7, 0.3f); // abu terang
+    glColor4f(0.0f, 1.0f, 0.0f, 0.5f); // abu terang
 
     glBegin(GL_QUADS);
-    glVertex3f(0,0,0);
-    glVertex3f(w,0,0);
-    glVertex3f(w,0,d);
-    glVertex3f(0,0,d);
+    glVertex3f(0,-0.01,0);
+    glVertex3f(w,-0.01,0);
+    glVertex3f(w,-0.01,d);
+    glVertex3f(0,-0.01,d);
     glEnd();
 }
+//23
+void drawSegment(float x1, float y1, float x2, float y2, float thick)
+{
+    float dx = x2 - x1, dy = y2 - y1;
+    float len = sqrt(dx*dx + dy*dy);
+    float nx = -dy/len * thick, ny = dx/len * thick;
+
+    glBegin(GL_QUADS);
+    glVertex2f(x1+nx, y1+ny);
+    glVertex2f(x1-nx, y1-ny);
+    glVertex2f(x2-nx, y2-ny);
+    glVertex2f(x2+nx, y2+ny);
+    glEnd();
+}
+
+void drawDigit7Seg(int digit, float ox, float oy, float w, float h, float thick)
+{
+    bool seg[10][7] = {
+    //  a      b      c      d      e      f      g
+        {true,  true,  true,  true,  true,  true,  false}, // 0
+        {false, true,  true,  false, false, false, false}, // 1
+        {true,  true,  false, true,  true,  false, true},  // 2
+        {true,  true,  true,  true,  false, false, true},  // 3
+        {false, true,  true,  false, false, true,  true},  // 4
+        {true,  false, true,  true,  false, true,  true},  // 5
+        {true,  false, true,  true,  true,  true,  true},  // 6
+        {true,  true,  true,  false, false, false, false}, // 7
+        {true,  true,  true,  true,  true,  true,  true},  // 8
+        {true,  true,  true,  true,  false, true,  true},  // 9
+    };
+
+    glColor3f(1.0f, 0.2f, 0.0f);
+
+    float mid = oy + h / 2.0f;
+
+    if (seg[digit][0]) drawSegment(ox,   oy,  ox+w, oy,  thick); // a atas
+    if (seg[digit][1]) drawSegment(ox+w, oy,  ox+w, mid, thick); // b kanan-atas
+    if (seg[digit][2]) drawSegment(ox+w, mid, ox+w, oy+h,thick); // c kanan-bawah
+    if (seg[digit][3]) drawSegment(ox,   oy+h,ox+w, oy+h,thick); // d bawah
+    if (seg[digit][4]) drawSegment(ox,   mid, ox,   oy+h,thick); // e kiri-bawah
+    if (seg[digit][5]) drawSegment(ox,   oy,  ox,   mid, thick); // f kiri-atas
+    if (seg[digit][6]) drawSegment(ox,   mid, ox+w, mid, thick); // g tengah
+}
+
+void drawNIM2D()
+{
+    float cellPx = c_nim.x * CELL_SIZE;
+    float cellPy = c_nim.y * CELL_SIZE;
+
+    float margin = CELL_SIZE * 0.02f;
+    float digitW = CELL_SIZE * 0.27f;
+    float digitH = CELL_SIZE * 0.75f;
+    float gap    = CELL_SIZE * 0.05f;
+    float thick  = CELL_SIZE * 0.06f;
+    float startY = cellPy + (CELL_SIZE - digitH) / 2.0f;
+
+    drawDigit7Seg(0, cellPx + margin,                    startY, digitW, digitH, thick);
+    drawDigit7Seg(7, cellPx + margin + (digitW+gap),     startY, digitW, digitH, thick);
+    drawDigit7Seg(6, cellPx + margin + (digitW+gap)*2,   startY, digitW, digitH, thick);
+}
+
 
 //6
 bool isWall(float px, float py)
@@ -387,8 +457,9 @@ void reInitMaze(){
     c_nim.y = y;
 
     // Reset player ke atas tengah
+    //27
     player.x = WIDTH / 2;
-    player.y = HEIGHT - 1;
+    player.y = 0;
 
     //13
     // glutDisplayFunc(display);
