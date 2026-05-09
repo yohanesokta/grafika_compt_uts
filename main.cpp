@@ -16,64 +16,9 @@
 #include <stdio.h>
 #include <math.h>
 
-
-// karena C++ jadi ribet, karena g mau ribet, jadi pake enum
-enum Color {
-    RED,
-    GREEN,
-    BLUE,
-    CYAN,
-    MAGENTA,
-    YELLOW,
-    WHITE,
-    BLACK
-};
-
-// setting warna, biar g capek - capek ngubah - ngubah float
-void setColor(Color c)
-{
-    switch(c)
-    {
-        case RED:
-            glColor3f(1.0, 0.0, 0.0);
-            break;
-
-        case GREEN:
-            glColor3f(0.0, 1.0, 0.0);
-            break;
-
-        case BLUE:
-            glColor3f(0.0, 0.0, 1.0);
-            break;
-
-        case CYAN:
-            glColor3f(0.0, 1.0, 1.0);
-            break;
-
-        case MAGENTA:
-            glColor3f(1.0, 0.0, 1.0);
-            break;
-
-        case YELLOW:
-            glColor3f(1.0, 1.0, 0.0);
-            break;
-
-        case WHITE:
-            glColor3f(1.0, 1.0, 1.0);
-            break;
-
-        case BLACK:
-            glColor3f(0.0, 0.0, 0.0);
-            break;
-    }
-}
-
-// 12 parameter, sekaligus setting warna per sisi, lebih fleksibel + karena malas
-void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAtas, float zAtas,
-                Color depan, Color belakang, Color kanan, Color kiri, Color atas, Color bawah 
-    ) {
+// 6 parameter
+void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAtas, float zAtas) {
     //depan
-    setColor(depan);
     glBegin(GL_POLYGON);
     glVertex3f(xBawah, yBawah, zBawah);
     glVertex3f(xBawah, yAtas, zBawah);
@@ -82,7 +27,6 @@ void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAta
     glEnd();
 
     //belakang
-    setColor(belakang);
     glBegin(GL_POLYGON);
     glVertex3f(xAtas, yAtas, zAtas);
     glVertex3f(xAtas, yBawah, zAtas);
@@ -91,7 +35,6 @@ void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAta
     glEnd();
 
     //kiri
-    setColor(kiri);
     glBegin(GL_POLYGON);
     glVertex3f(xBawah, yBawah, zBawah);
     glVertex3f(xBawah, yAtas, zBawah);
@@ -100,7 +43,6 @@ void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAta
     glEnd();
 
     //kanan
-    setColor(kanan);
     glBegin(GL_POLYGON);
     glVertex3f(xAtas, yBawah, zBawah);
     glVertex3f(xAtas, yAtas, zBawah);
@@ -109,7 +51,6 @@ void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAta
     glEnd();
 
     //bawah
-    setColor(bawah);
     glBegin(GL_POLYGON);
     glVertex3f(xBawah, yBawah, zBawah);
     glVertex3f(xBawah, yBawah, zAtas);
@@ -118,7 +59,6 @@ void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAta
     glEnd();
 
     // //atas
-    setColor(atas);
     glBegin(GL_POLYGON);
     glVertex3f(xBawah, yAtas, zBawah);
     glVertex3f(xBawah, yAtas, zAtas);
@@ -265,54 +205,21 @@ void display()
         float baseZ = c_nim.y * CELL_SIZE + CELL_SIZE/2;
 
         // angka 0
-        buildbox(baseX + (-1.8)*scale, 1, baseZ + (1.6)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (1.8)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
-        buildbox(baseX + (-1.8)*scale, 1, baseZ + (-1.8)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (-1.6)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
-        buildbox(baseX + (-1.8)*scale, 1, baseZ + (-1.6)*scale, baseX + (-1.6)*scale, 1.5, baseZ + (1.6)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
-        buildbox(baseX + (-1.2)*scale, 1, baseZ + (-1.6)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (1.6)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
+        buildbox(baseX + (-1.8)*scale, 1, baseZ + (1.6)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (1.8)*scale);
+        buildbox(baseX + (-1.8)*scale, 1, baseZ + (-1.8)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (-1.6)*scale);
+        buildbox(baseX + (-1.8)*scale, 1, baseZ + (-1.6)*scale, baseX + (-1.6)*scale, 1.5, baseZ + (1.6)*scale);
+        buildbox(baseX + (-1.2)*scale, 1, baseZ + (-1.6)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (1.6)*scale);
         
         // angka 7
-        buildbox(baseX + (-0.8)*scale, 1, baseZ + (1.6)*scale, baseX + (0.6)*scale, 1.5, baseZ + (1.8)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
-        buildbox(baseX + (0.4)*scale, 1, baseZ + (-1.8)*scale, baseX + (0.6)*scale, 1.5, baseZ + (1.6)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
+        buildbox(baseX + (-0.8)*scale, 1, baseZ + (1.6)*scale, baseX + (0.6)*scale, 1.5, baseZ + (1.8)*scale);
+        buildbox(baseX + (0.4)*scale, 1, baseZ + (-1.8)*scale, baseX + (0.6)*scale, 1.5, baseZ + (1.6)*scale);
         
         // angka 6
-        buildbox(baseX + (0.8)*scale, 1, baseZ + (1.6)*scale, baseX + (1.8)*scale, 1.5, baseZ + (1.8)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
-        buildbox(baseX + (0.8)*scale, 1, baseZ + (-1.8)*scale, baseX + (1.0)*scale, 1.5, baseZ + (1.6)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
-        buildbox(baseX + (1.0)*scale, 1, baseZ + (-1.8)*scale, baseX + (1.8)*scale, 1.5, baseZ + (-1.6)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
-        buildbox(baseX + (1.6)*scale, 1, baseZ + (-1.6)*scale, baseX + (1.8)*scale, 1.5, baseZ + (0.0)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
-        buildbox(baseX + (1.0)*scale, 1, baseZ + (-0.2)*scale, baseX + (1.6)*scale, 1.5, baseZ + (0.0)*scale,
-            BLACK,BLACK,BLACK,
-            BLACK,BLACK,BLACK
-        );
+        buildbox(baseX + (0.8)*scale, 1, baseZ + (1.6)*scale, baseX + (1.8)*scale, 1.5, baseZ + (1.8)*scale);
+        buildbox(baseX + (0.8)*scale, 1, baseZ + (-1.8)*scale, baseX + (1.0)*scale, 1.5, baseZ + (1.6)*scale);
+        buildbox(baseX + (1.0)*scale, 1, baseZ + (-1.8)*scale, baseX + (1.8)*scale, 1.5, baseZ + (-1.6)*scale);
+        buildbox(baseX + (1.6)*scale, 1, baseZ + (-1.6)*scale, baseX + (1.8)*scale, 1.5, baseZ + (0.0)*scale);
+        buildbox(baseX + (1.0)*scale, 1, baseZ + (-0.2)*scale, baseX + (1.6)*scale, 1.5, baseZ + (0.0)*scale);
 
         // PLAYER
         drawWall3D(player.x, player.y, 1.5f, true);
@@ -330,32 +237,18 @@ void drawWall3D(float x, float z, float h, bool isPlayer)
     if (isPlayer)
     {
         // PLAYER ANOMALI
+        glColor3f(1.0,0.0,0.0);
         buildbox(
             x0, 0.0, z0,
-            x0 + s, h, z0 + s,
-
-            RED,       // depan
-            RED,       // belakang
-            RED,       // kanan
-            RED,       // kiri
-            RED,       // atas
-            RED        // bawah
-        );
+            x0 + s, h, z0 + s);
     }
     else
     {
         // TEMBOK
+        glColor3f(0.0,0.0,1.0);
         buildbox(
             x0, 0.0, z0,
-            x0 + s, h, z0 + s,
-
-            MAGENTA,    // depan
-            GREEN,      // belakang
-            YELLOW,     // kanan
-            CYAN,       // kiri
-            BLUE,       // atas
-            WHITE       // bawah
-        );
+            x0 + s, h, z0 + s);
     }
 }
 
