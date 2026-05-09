@@ -14,7 +14,6 @@
 #include <time.h>
 #include "maze.h"
 #include <stdio.h>
-//18
 #include <math.h>
 
 
@@ -132,7 +131,6 @@ void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAta
 
 Maze maze; // variabel global maze
 bool is3D = false; //1
-//15
 float rotY = 45.0f; // kiri-kanan
 float rotX = 30.0f; // atas-bawah
 
@@ -142,7 +140,6 @@ struct movement
     float x;
     float y;
 };
-
 
 void reInitMaze();
 //14
@@ -156,7 +153,6 @@ movement player {(float)(WIDTH/2), (float)(HEIGHT-1)};
 movement c_nim {1.0,1.0};
 
 // Fungsi render (digambar tiap frame)
-//3
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -325,7 +321,6 @@ void display()
     glutSwapBuffers();
 }
 
-//4
 void drawWall3D(float x, float z, float h, bool isPlayer)
 {
     float x0 = x * CELL_SIZE;
@@ -363,7 +358,7 @@ void drawWall3D(float x, float z, float h, bool isPlayer)
         );
     }
 }
-//5
+
 void drawFloor3D()
 {
     float w = WIDTH * CELL_SIZE;
@@ -379,7 +374,6 @@ void drawFloor3D()
     glEnd();
 }
 
-//6
 bool isWall(float px, float py)
 {
     int x = (int)px;
@@ -420,7 +414,6 @@ void movement_handler(float dx, float dy) {
     float nx = player.x + dx;
     float ny = player.y + dy;
 
-    //7
     // cek apakah nabrak tembok
     float margin = 0.05f; // sedikit offset agar tidak nyangkut di tepi
     float size   = 1.0f - margin * 2; // ukuran efektif player
@@ -438,7 +431,6 @@ void movement_handler(float dx, float dy) {
     }
 
     // Refresh tampilan
-    //11
     // glutDisplayFunc(display);
     glutPostRedisplay();
 }
@@ -527,7 +519,6 @@ void reInitMaze(){
     player.x = WIDTH / 2;
     player.y = HEIGHT - 1;
 
-    //13
     // glutDisplayFunc(display);
 
     glutPostRedisplay();
@@ -541,7 +532,6 @@ int main(int argc, char *argv[])
     // Mode tampilan
     // glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 
-    //9
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     // Ukuran window
     glutInitWindowSize(500, 500);
@@ -554,7 +544,6 @@ int main(int argc, char *argv[])
 
     
     // Set input keyboard
-    //14
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
 
