@@ -14,12 +14,63 @@
 #include <time.h>
 #include "maze.h"
 #include <stdio.h>
-//18
 #include <math.h>
+
+// 6 parameter
+void buildbox (float xBawah, float yBawah, float zBawah, float xAtas, float yAtas, float zAtas) {
+    //depan
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xAtas, yAtas, zBawah);
+    glVertex3f(xAtas, yBawah, zBawah);
+    glEnd();
+
+    //belakang
+    glBegin(GL_POLYGON);
+    glVertex3f(xAtas, yAtas, zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glEnd();
+
+    //kiri
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glEnd();
+
+    //kanan
+    glBegin(GL_POLYGON);
+    glVertex3f(xAtas, yBawah, zBawah);
+    glVertex3f(xAtas, yAtas, zBawah);
+    glVertex3f(xAtas, yAtas, zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+    glEnd();
+
+    //bawah
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+    glVertex3f(xAtas, yBawah, zBawah);
+    glEnd();
+
+    // //atas
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glVertex3f(xAtas, yAtas, zAtas);
+    glVertex3f(xAtas, yAtas, zBawah);
+    glEnd();
+
+    glFlush();
+}
 
 Maze maze; // variabel global maze
 bool is3D = false; //1
-//15
 float rotY = 45.0f; // kiri-kanan
 float rotX = 30.0f; // atas-bawah
 
@@ -29,7 +80,6 @@ struct movement
     float x;
     float y;
 };
-
 
 void reInitMaze();
 //14
@@ -43,7 +93,6 @@ movement player {(float)(WIDTH/2), (float)(HEIGHT-1)};
 movement c_nim {1.0,1.0};
 
 // Fungsi render (digambar tiap frame)
-//3
 void display()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -74,11 +123,39 @@ void display()
                 }
             }
         }
+        //NIM (jangan dihapus goblok)
+        glColor3f(0.0,0.0,0.0);
+
+        float scale = 0.5;
+
+        // Posisi tengah angka
+        float baseX = c_nim.x * CELL_SIZE + CELL_SIZE/2;
+        float baseY = c_nim.y * CELL_SIZE + CELL_SIZE/2;
+
+        // Gambar angka "076" (menggunakan GL_POLYGON / GLRectf)
+        
+        // angka 0
+        glRectf(baseX + (-1.8)*scale, baseY + (1.6)*scale, baseX + (-1.0)*scale, baseY + (1.8)*scale);
+        glRectf(baseX + (-1.8)*scale, baseY + (-1.8)*scale, baseX + (-1.0)*scale, baseY + (-1.6)*scale);
+        glRectf(baseX + (-1.8)*scale, baseY + (-1.6)*scale, baseX + (-1.6)*scale, baseY + (1.6)*scale);
+        glRectf(baseX + (-1.2)*scale, baseY + (-1.6)*scale, baseX + (-1.0)*scale, baseY + (1.6)*scale);
+        
+        // angka 7
+        glRectf(baseX + (-0.8)*scale, baseY + (1.6)*scale, baseX + (0.6)*scale, baseY + (1.8)*scale);
+        glRectf(baseX + (0.4)*scale, baseY + (-1.8)*scale, baseX + (0.6)*scale, baseY + (1.6)*scale);
+        
+        // angka 6
+        glRectf(baseX + (0.8)*scale, baseY + (1.6)*scale, baseX + (1.8)*scale, baseY + (1.8)*scale);
+        glRectf(baseX + (0.8)*scale, baseY + (-1.8)*scale, baseX + (1.0)*scale, baseY + (1.6)*scale);
+        glRectf(baseX + (1.0)*scale, baseY + (-1.8)*scale, baseX + (1.8)*scale, baseY + (-1.6)*scale);
+        glRectf(baseX + (1.6)*scale, baseY + (-1.6)*scale, baseX + (1.8)*scale, baseY + (0.0)*scale);
+        glRectf(baseX + (1.0)*scale, baseY + (-0.2)*scale, baseX + (1.6)*scale, baseY + (0.0)*scale);
 
         // PLAYER
         glColor3f(1.0, 0.0, 0.0);
-        glRectf(player.x * CELL_SIZE, player.y * CELL_SIZE,
-                (player.x + 1) * CELL_SIZE, (player.y + 1) * CELL_SIZE);
+        glRectf(player.x * CELL_SIZE, player.y * CELL_SIZE,(player.x + 1) * CELL_SIZE, (player.y + 1) * CELL_SIZE);
+
+        glFlush();
     }
     else
     {
@@ -118,6 +195,32 @@ void display()
             }
         }
 
+        //NIM (jangan dihapus goblok)
+        glColor3f(0.0,0.0,0.0);
+
+        float scale = 0.5;
+
+        // Posisi tengah angka
+        float baseX = c_nim.x * CELL_SIZE + CELL_SIZE/2;
+        float baseZ = c_nim.y * CELL_SIZE + CELL_SIZE/2;
+
+        // angka 0
+        buildbox(baseX + (-1.8)*scale, 1, baseZ + (1.6)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (1.8)*scale);
+        buildbox(baseX + (-1.8)*scale, 1, baseZ + (-1.8)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (-1.6)*scale);
+        buildbox(baseX + (-1.8)*scale, 1, baseZ + (-1.6)*scale, baseX + (-1.6)*scale, 1.5, baseZ + (1.6)*scale);
+        buildbox(baseX + (-1.2)*scale, 1, baseZ + (-1.6)*scale, baseX + (-1.0)*scale, 1.5, baseZ + (1.6)*scale);
+        
+        // angka 7
+        buildbox(baseX + (-0.8)*scale, 1, baseZ + (1.6)*scale, baseX + (0.6)*scale, 1.5, baseZ + (1.8)*scale);
+        buildbox(baseX + (0.4)*scale, 1, baseZ + (-1.8)*scale, baseX + (0.6)*scale, 1.5, baseZ + (1.6)*scale);
+        
+        // angka 6
+        buildbox(baseX + (0.8)*scale, 1, baseZ + (1.6)*scale, baseX + (1.8)*scale, 1.5, baseZ + (1.8)*scale);
+        buildbox(baseX + (0.8)*scale, 1, baseZ + (-1.8)*scale, baseX + (1.0)*scale, 1.5, baseZ + (1.6)*scale);
+        buildbox(baseX + (1.0)*scale, 1, baseZ + (-1.8)*scale, baseX + (1.8)*scale, 1.5, baseZ + (-1.6)*scale);
+        buildbox(baseX + (1.6)*scale, 1, baseZ + (-1.6)*scale, baseX + (1.8)*scale, 1.5, baseZ + (0.0)*scale);
+        buildbox(baseX + (1.0)*scale, 1, baseZ + (-0.2)*scale, baseX + (1.6)*scale, 1.5, baseZ + (0.0)*scale);
+
         // PLAYER
         drawWall3D(player.x, player.y, 1.5f, true);
     }
@@ -125,100 +228,36 @@ void display()
     glutSwapBuffers();
 }
 
-//4
 void drawWall3D(float x, float z, float h, bool isPlayer)
 {
     float x0 = x * CELL_SIZE;
     float z0 = z * CELL_SIZE;
-    float s = CELL_SIZE;
-
-    glBegin(GL_QUADS);
+    float s  = CELL_SIZE;
 
     if (isPlayer)
     {
-        // 🔴 PLAYER (merah)
-        // ATAS
-        glColor3f(1.0, 0.3, 0.3);
-        glVertex3f(x0, h, z0);
-        glVertex3f(x0+s, h, z0);
-        glVertex3f(x0+s, h, z0+s);
-        glVertex3f(x0, h, z0+s);
-
-        // DEPAN
-        glColor3f(0.9, 0.0, 0.0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0,h,z0+s);
-
-        // KANAN
-        glColor3f(0.6, 0.0, 0.0);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0+s,h,z0);
-        // BELAKANG
-        glColor3f(0.8, 0.0, 0.0);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,h,z0);
-        glVertex3f(x0,h,z0);
-
-        // KIRI
-        glColor3f(0.7, 0.0, 0.0);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0,h,z0+s);
-        glVertex3f(x0,h,z0);
+        // PLAYER ANOMALI
+        glColor3f(1.0,0.0,0.0);
+        buildbox(
+            x0, 0.0, z0,
+            x0 + s, h, z0 + s);
     }
     else
     {
-        // 🔵 WALL (biru)
-        // ATAS
-        glColor3f(0.4, 0.7, 1.0);
-        glVertex3f(x0, h, z0);
-        glVertex3f(x0+s, h, z0);
-        glVertex3f(x0+s, h, z0+s);
-        glVertex3f(x0, h, z0+s);
-
-        // DEPAN
-        glColor3f(0.2, 0.5, 1.0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0,h,z0+s);
-
-        // KANAN
-        glColor3f(0.1, 0.3, 0.8);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0+s,h,z0);
-
-        // BELAKANG
-        glColor3f(0.15, 0.4, 0.9);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,h,z0);
-        glVertex3f(x0,h,z0);
-
-        // KIRI
-        glColor3f(0.1, 0.35, 0.85);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0,h,z0+s);
-        glVertex3f(x0,h,z0);
+        // TEMBOK
+        glColor3f(0.0,0.0,1.0);
+        buildbox(
+            x0, 0.0, z0,
+            x0 + s, h, z0 + s);
     }
-
-    glEnd();
 }
-//5
+
 void drawFloor3D()
 {
     float w = WIDTH * CELL_SIZE;
     float d = HEIGHT * CELL_SIZE;
 
-    glColor3f(0.7, 0.7, 0.7); // abu terang
+    glColor4f(0.0, 0.0, 0.5, 0.2); // abu terang
 
     glBegin(GL_QUADS);
     glVertex3f(0,0,0);
@@ -228,7 +267,6 @@ void drawFloor3D()
     glEnd();
 }
 
-//6
 bool isWall(float px, float py)
 {
     int x = (int)px;
@@ -269,7 +307,6 @@ void movement_handler(float dx, float dy) {
     float nx = player.x + dx;
     float ny = player.y + dy;
 
-    //7
     // cek apakah nabrak tembok
     float margin = 0.05f; // sedikit offset agar tidak nyangkut di tepi
     float size   = 1.0f - margin * 2; // ukuran efektif player
@@ -287,7 +324,6 @@ void movement_handler(float dx, float dy) {
     }
 
     // Refresh tampilan
-    //11
     // glutDisplayFunc(display);
     glutPostRedisplay();
 }
@@ -306,7 +342,6 @@ void keyboard(unsigned char key, int x, int y)
         exit(0);
         break;
 
-    //19
     case 119: // w (atas)
         movement_handler(0,-speed);
         break;
@@ -328,7 +363,6 @@ void keyboard(unsigned char key, int x, int y)
         reInitMaze();
         break;
 
-    //8
     case 'v':
     case 'V':
         is3D = !is3D;
@@ -339,7 +373,7 @@ void keyboard(unsigned char key, int x, int y)
     case 'i': case 'I': rotX -= 5.0f; break;
     case 'k': case 'K': rotX += 5.0f; break;
     }
-    //17
+
     if (rotY > 360.0f) rotY -= 360.0f;
     if (rotY < 0.0f)   rotY += 360.0f;
     glutPostRedisplay();
@@ -378,7 +412,6 @@ void reInitMaze(){
     player.x = WIDTH / 2;
     player.y = HEIGHT - 1;
 
-    //13
     // glutDisplayFunc(display);
 
     glutPostRedisplay();
@@ -392,7 +425,6 @@ int main(int argc, char *argv[])
     // Mode tampilan
     // glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 
-    //9
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     // Ukuran window
     glutInitWindowSize(500, 500);
@@ -405,7 +437,6 @@ int main(int argc, char *argv[])
 
     
     // Set input keyboard
-    //14
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
 
