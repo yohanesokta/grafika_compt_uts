@@ -22,6 +22,21 @@ bool is3D = false; //1
 //15
 float rotY = 45.0f; // kiri-kanan
 float rotX = 30.0f; // atas-bawah
+//29
+// ==========================
+// ANIMASI NIM 3D
+// ==========================
+float nimOffset = 0.0f;
+bool nimNaik = true;
+
+float nimRotX = 0.0f;
+float nimRotY = 0.0f;
+float nimSpin = 0.0f;
+
+// mode mouse
+bool modeM1 = false;
+bool modeM2 = false;
+bool modeM3 = false;
 
 // Struktur posisi (player & objek lain)
 struct movement
@@ -33,11 +48,25 @@ struct movement
 
 void reInitMaze();
 //14
-void drawWall3D(float x, float z, float h, bool isPlayer);
+void drawWall3D(
+    float xBawah, float yBawah, float zBawah,
+    float xAtas,  float yAtas,  float zAtas,
+    bool isPlayer);
+
 void drawFloor3D();
 
+//25
+void drawSegment(float x1, float y1, float x2, float y2, float thick);
+void drawDigit7Seg(int digit, float ox, float oy, float w, float h, float thick);
+void drawNIM2D();
+//28
+void drawDigit7Seg3D(int digit, float ox, float oy, float oz, float s);
+void drawNIM3D();
+void buildbox(float xBawah, float yBawah, float zBawah,float xAtas, float yAtas, float zAtas);
+
 // Posisi player (mulai di tengah atas)
-movement player {(float)(WIDTH/2), (float)(HEIGHT-1)};
+//26
+movement player {(float)(WIDTH/2), 0.0f};
 
 // Posisi angka (nim)
 movement c_nim {1.0,1.0};
@@ -79,6 +108,9 @@ void display()
         glColor3f(1.0, 0.0, 0.0);
         glRectf(player.x * CELL_SIZE, player.y * CELL_SIZE,
                 (player.x + 1) * CELL_SIZE, (player.y + 1) * CELL_SIZE);
+
+        //24
+        drawNIM2D();
     }
     else
     {
@@ -95,120 +127,114 @@ void display()
 
         float radius = 40.0f;
 
-        float camX = cx + radius * cos(rotY * 3.14159 / 180.0f) * cos(rotX * 3.14159 / 180.0f);
-        float camY = radius * sin(rotX * 3.14159 / 180.0f);
-        float camZ = cz + radius * sin(rotY * 3.14159 / 180.0f) * cos(rotX * 3.14159 / 180.0f);
-
-        gluLookAt(camX, camY, camZ,
-                cx, 0.0, cz,
+        //20
+        gluLookAt(40, 40, 40,   // posisi kamera tetap
+                cx, 0.0, cz,  // lihat ke tengah maze
                 0.0, 1.0, 0.0);
 
-        // FLOOR
-        drawFloor3D();
+        glTranslatef(cx, 0.0f, cz); // pindah ke tengah maze
+        glRotatef(rotY, 0.0f, 1.0f, 0.0f); // rotasi kiri-kanan
+        glRotatef(rotX, 1.0f, 0.0f, 0.0f); // rotasi atas-bawah
+        glTranslatef(-cx, 0.0f, -cz); // balik lagi
 
-        // WALL
+        //21
+        // WALL dulu
         for (int y = 0; y < HEIGHT; y++)
         {
             for (int x = 0; x < WIDTH; x++)
             {
                 if (maze.grid[y][x].wall)
                 {
-                    drawWall3D(x, y, 2.5f, false);
+                    drawWall3D(
+                        x * CELL_SIZE,
+                        0.0f,
+                        y * CELL_SIZE,
+
+                        (x + 1) * CELL_SIZE,
+                        2.5f,
+                        (y + 1) * CELL_SIZE,
+
+                        false
+                    );
                 }
             }
         }
 
         // PLAYER
-        drawWall3D(player.x, player.y, 1.5f, true);
+        drawWall3D(
+            player.x * CELL_SIZE,
+            0.0f,
+            player.y * CELL_SIZE,
+
+            (player.x + 1) * CELL_SIZE,
+            1.5f,
+            (player.y + 1) * CELL_SIZE,
+
+            true
+        );
+
+        // TRANSPARAN
+        glDepthMask(GL_FALSE);  
+        drawFloor3D();
+        drawNIM3D();
+        glDepthMask(GL_TRUE);
     }
 
     glutSwapBuffers();
 }
 
 //4
-void drawWall3D(float x, float z, float h, bool isPlayer)
+void drawWall3D(
+    float xBawah, float yBawah, float zBawah,
+    float xAtas,  float yAtas,  float zAtas,
+    bool isPlayer)
 {
-    float x0 = x * CELL_SIZE;
-    float z0 = z * CELL_SIZE;
-    float s = CELL_SIZE;
-
     glBegin(GL_QUADS);
 
     if (isPlayer)
     {
-        // 🔴 PLAYER (merah)
-        // ATAS
-        glColor3f(1.0, 0.3, 0.3);
-        glVertex3f(x0, h, z0);
-        glVertex3f(x0+s, h, z0);
-        glVertex3f(x0+s, h, z0+s);
-        glVertex3f(x0, h, z0+s);
-
-        // DEPAN
-        glColor3f(0.9, 0.0, 0.0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0,h,z0+s);
-
-        // KANAN
-        glColor3f(0.6, 0.0, 0.0);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0+s,h,z0);
-        // BELAKANG
-        glColor3f(0.8, 0.0, 0.0);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,h,z0);
-        glVertex3f(x0,h,z0);
-
-        // KIRI
-        glColor3f(0.7, 0.0, 0.0);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0,h,z0+s);
-        glVertex3f(x0,h,z0);
+        glColor3f(1.0, 0.0, 0.0);
     }
     else
     {
-        // 🔵 WALL (biru)
-        // ATAS
-        glColor3f(0.4, 0.7, 1.0);
-        glVertex3f(x0, h, z0);
-        glVertex3f(x0+s, h, z0);
-        glVertex3f(x0+s, h, z0+s);
-        glVertex3f(x0, h, z0+s);
-
-        // DEPAN
-        glColor3f(0.2, 0.5, 1.0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0,h,z0+s);
-
-        // KANAN
-        glColor3f(0.1, 0.3, 0.8);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,0,z0+s);
-        glVertex3f(x0+s,h,z0+s);
-        glVertex3f(x0+s,h,z0);
-
-        // BELAKANG
-        glColor3f(0.15, 0.4, 0.9);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0+s,0,z0);
-        glVertex3f(x0+s,h,z0);
-        glVertex3f(x0,h,z0);
-
-        // KIRI
-        glColor3f(0.1, 0.35, 0.85);
-        glVertex3f(x0,0,z0);
-        glVertex3f(x0,0,z0+s);
-        glVertex3f(x0,h,z0+s);
-        glVertex3f(x0,h,z0);
+        glColor3f(0.1, 0.3, 1.0);
     }
+
+    // DEPAN
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yAtas,  zBawah);
+    glVertex3f(xAtas,  yAtas,  zBawah);
+    glVertex3f(xAtas,  yBawah, zBawah);
+
+    // BELAKANG
+    glVertex3f(xAtas,  yAtas,  zAtas);
+    glVertex3f(xAtas,  yBawah, zAtas);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glVertex3f(xBawah, yAtas,  zAtas);
+
+    // KIRI
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yAtas,  zBawah);
+    glVertex3f(xBawah, yAtas,  zAtas);
+    glVertex3f(xBawah, yBawah, zAtas);
+
+    // KANAN
+    glVertex3f(xAtas, yBawah, zBawah);
+    glVertex3f(xAtas, yAtas,  zBawah);
+    glVertex3f(xAtas, yAtas,  zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+
+    // BAWAH
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glVertex3f(xAtas,  yBawah, zAtas);
+    glVertex3f(xAtas,  yBawah, zBawah);
+
+    // ATAS
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glVertex3f(xAtas,  yAtas, zAtas);
+    glVertex3f(xAtas,  yAtas, zBawah);
 
     glEnd();
 }
@@ -218,15 +244,267 @@ void drawFloor3D()
     float w = WIDTH * CELL_SIZE;
     float d = HEIGHT * CELL_SIZE;
 
-    glColor3f(0.7, 0.7, 0.7); // abu terang
+    glColor4f(0.0f, 1.0f, 0.0f, 0.5f); // abu terang
 
     glBegin(GL_QUADS);
-    glVertex3f(0,0,0);
-    glVertex3f(w,0,0);
-    glVertex3f(w,0,d);
-    glVertex3f(0,0,d);
+    glVertex3f(0,-0.01,0);
+    glVertex3f(w,-0.01,0);
+    glVertex3f(w,-0.01,d);
+    glVertex3f(0,-0.01,d);
     glEnd();
 }
+//23
+void drawSegment(float x1, float y1, float x2, float y2, float thick)
+{
+    float dx = x2 - x1, dy = y2 - y1;
+    float len = sqrt(dx*dx + dy*dy);
+    float nx = -dy/len * thick, ny = dx/len * thick;
+
+    glBegin(GL_QUADS);
+    glVertex2f(x1+nx, y1+ny);
+    glVertex2f(x1-nx, y1-ny);
+    glVertex2f(x2-nx, y2-ny);
+    glVertex2f(x2+nx, y2+ny);
+    glEnd();
+}
+
+void drawDigit7Seg(int digit, float ox, float oy, float w, float h, float thick)
+{
+    bool seg[10][7] = {
+    //  a      b      c      d      e      f      g
+        {true,  true,  true,  true,  true,  true,  false}, // 0
+        {false, true,  true,  false, false, false, false}, // 1
+        {true,  true,  false, true,  true,  false, true},  // 2
+        {true,  true,  true,  true,  false, false, true},  // 3
+        {false, true,  true,  false, false, true,  true},  // 4
+        {true,  false, true,  true,  false, true,  true},  // 5
+        {true,  false, true,  true,  true,  true,  true},  // 6
+        {true,  true,  true,  false, false, false, false}, // 7
+        {true,  true,  true,  true,  true,  true,  true},  // 8
+        {true,  true,  true,  true,  false, true,  true},  // 9
+    };
+
+    glColor3f(1.0f, 0.2f, 0.0f);
+
+    float mid = oy + h / 2.0f;
+
+    if (seg[digit][0]) drawSegment(ox,   oy,  ox+w, oy,  thick); // a atas
+    if (seg[digit][1]) drawSegment(ox+w, oy,  ox+w, mid, thick); // b kanan-atas
+    if (seg[digit][2]) drawSegment(ox+w, mid, ox+w, oy+h,thick); // c kanan-bawah
+    if (seg[digit][3]) drawSegment(ox,   oy+h,ox+w, oy+h,thick); // d bawah
+    if (seg[digit][4]) drawSegment(ox,   mid, ox,   oy+h,thick); // e kiri-bawah
+    if (seg[digit][5]) drawSegment(ox,   oy,  ox,   mid, thick); // f kiri-atas
+    if (seg[digit][6]) drawSegment(ox,   mid, ox+w, mid, thick); // g tengah
+}
+
+void drawNIM2D()
+{
+    float cellPx = c_nim.x * CELL_SIZE;
+    float cellPy = c_nim.y * CELL_SIZE;
+
+    float margin = CELL_SIZE * 0.02f;
+    float digitW = CELL_SIZE * 0.27f;
+    float digitH = CELL_SIZE * 0.75f;
+    float gap    = CELL_SIZE * 0.05f;
+    float thick  = CELL_SIZE * 0.06f;
+    float startY = cellPy + (CELL_SIZE - digitH) / 2.0f;
+
+    drawDigit7Seg(0, cellPx + margin,                    startY, digitW, digitH, thick);
+    drawDigit7Seg(7, cellPx + margin + (digitW+gap),     startY, digitW, digitH, thick);
+    drawDigit7Seg(6, cellPx + margin + (digitW+gap)*2,   startY, digitW, digitH, thick);
+}
+
+//29
+void buildbox (float xBawah, float yBawah, float zBawah,
+               float xAtas, float yAtas, float zAtas)
+{
+    // depan
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xAtas, yAtas, zBawah);
+    glVertex3f(xAtas, yBawah, zBawah);
+    glEnd();
+
+    // belakang
+    glBegin(GL_POLYGON);
+    glVertex3f(xAtas, yAtas, zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glEnd();
+
+    // kiri
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glEnd();
+
+    // kanan
+    glBegin(GL_POLYGON);
+    glVertex3f(xAtas, yBawah, zBawah);
+    glVertex3f(xAtas, yAtas, zBawah);
+    glVertex3f(xAtas, yAtas, zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+    glEnd();
+
+    // bawah
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yBawah, zBawah);
+    glVertex3f(xBawah, yBawah, zAtas);
+    glVertex3f(xAtas, yBawah, zAtas);
+    glVertex3f(xAtas, yBawah, zBawah);
+    glEnd();
+
+    // atas
+    glBegin(GL_POLYGON);
+    glVertex3f(xBawah, yAtas, zBawah);
+    glVertex3f(xBawah, yAtas, zAtas);
+    glVertex3f(xAtas, yAtas, zAtas);
+    glVertex3f(xAtas, yAtas, zBawah);
+    glEnd();
+}
+
+void drawDigit7Seg3D(int digit, float ox, float oy, float oz, float s)
+{
+    bool seg[10][7] = {
+        {1,1,1,1,1,1,0},
+        {0,1,1,0,0,0,0},
+        {1,1,0,1,1,0,1},
+        {1,1,1,1,0,0,1},
+        {0,1,1,0,0,1,1},
+        {1,0,1,1,0,1,1},
+        {1,0,1,1,1,1,1},
+        {1,1,1,0,0,0,0},
+        {1,1,1,1,1,1,1},
+        {1,1,1,1,0,1,1}
+    };
+
+    float w = s;
+    float h = s * 2.0f;
+
+    float t = s * 0.2f;
+
+    // tipis ke atas
+    float depthY = 0.2f;
+
+    glColor3f(1.0f, 0.3f, 0.0f);
+
+    // ======================
+    // SEKARANG Z DIBALIK
+    // ======================
+
+    // a (atas)
+    if(seg[digit][0])
+        buildbox(
+            ox, oy, oz,
+            ox+w, oy+depthY, oz+t
+        );
+
+    // b
+    if(seg[digit][1])
+        buildbox(
+            ox+w, oy, oz,
+            ox+w+t, oy+depthY, oz+h/2
+        );
+
+    // c
+    if(seg[digit][2])
+        buildbox(
+            ox+w, oy, oz+h/2,
+            ox+w+t, oy+depthY, oz+h
+        );
+
+    // d (bawah)
+    if(seg[digit][3])
+        buildbox(
+            ox, oy, oz+h,
+            ox+w, oy+depthY, oz+h+t
+        );
+
+    // e
+    if(seg[digit][4])
+        buildbox(
+            ox-t, oy, oz+h/2,
+            ox, oy+depthY, oz+h
+        );
+
+    // f
+    if(seg[digit][5])
+        buildbox(
+            ox-t, oy, oz,
+            ox, oy+depthY, oz+h/2
+        );
+
+    // g
+    if(seg[digit][6])
+        buildbox(
+            ox, oy, oz+h/2,
+            ox+w, oy+depthY, oz+h/2+t
+        );
+}
+
+//30
+void drawNIM3D()
+{
+    float scale = CELL_SIZE * 0.18f;
+    float gap   = CELL_SIZE * 0.30f;
+
+    // ukuran total nim
+    float totalWidth  = gap * 2 + scale;
+    float totalHeight = scale * 2.0f;
+    float totalDepth  = scale * 0.2f;
+
+    // posisi nim di maze
+    float baseX = c_nim.x * CELL_SIZE + CELL_SIZE/2 - totalWidth/2;
+    float baseY = 1.0f;
+    float baseZ = c_nim.y * CELL_SIZE + CELL_SIZE/2 - totalHeight/2;
+
+    // pusat objek NIM
+    float centerX = totalWidth  / 2.0f;
+    float centerY = totalDepth  / 2.0f;
+    float centerZ = totalHeight / 2.0f;
+
+    glPushMatrix();
+
+    // pindah ke posisi nim
+    glTranslatef(baseX, baseY, baseZ);
+
+    // pindah ke tengah nim
+    glTranslatef(centerX, centerY, centerZ);
+
+    // ROTASI DI TENGAH
+    glRotatef(nimRotY, 0.0f, 1.0f, 0.0f);
+    glRotatef(nimRotX, 1.0f, 0.0f, 0.0f);
+    glRotatef(nimSpin, 0.0f, 0.0f, 1.0f);
+
+    // balik lagi
+    glTranslatef(-centerX, -centerY, -centerZ);
+
+    // gambar nim
+    drawDigit7Seg3D(0, 0, 0, 0, scale);
+
+    drawDigit7Seg3D(
+        7,
+        gap,
+        0,
+        0,
+        scale
+    );
+
+    drawDigit7Seg3D(
+        6,
+        gap * 2,
+        0,
+        0,
+        scale
+    );
+
+    glPopMatrix();
+}
+
 
 //6
 bool isWall(float px, float py)
@@ -350,6 +628,44 @@ float randomFloat() {
     return (float)rand() / RAND_MAX;
 }
 
+//30
+
+void updateAnimation(int value)
+{
+    // gerakan naik turun otomatis
+    if (nimNaik)
+        nimOffset += 0.05f;
+    else
+        nimOffset -= 0.05f;
+
+    if (nimOffset > 2.0f)
+        nimNaik = false;
+
+    if (nimOffset < -2.0f)
+        nimNaik = true;
+
+    // =========================
+    // M1 = ROTASI X
+    // =========================
+    if (modeM1)
+        nimRotX += 2.0f;
+
+    // =========================
+    // M2 = ROTASI Y
+    // =========================
+    if (modeM2)
+        nimRotY += 2.0f;
+
+    // =========================
+    // M3 = ROTASI Z
+    // =========================
+    if (modeM3)
+        nimSpin += 3.0f;
+
+    glutPostRedisplay();
+    glutTimerFunc(16, updateAnimation, 0);
+}
+
 // Generate ulang maze + reset posisi
 void reInitMaze(){
     srand(time(NULL));
@@ -375,13 +691,44 @@ void reInitMaze(){
     c_nim.y = y;
 
     // Reset player ke atas tengah
+    //27
     player.x = WIDTH / 2;
-    player.y = HEIGHT - 1;
+    player.y = 0;
 
     //13
     // glutDisplayFunc(display);
 
     glutPostRedisplay();
+}
+
+//31
+void mouse(int button, int state, int x, int y)
+{
+    if(state == GLUT_DOWN)
+    {
+        // reset dulu
+        modeM1 = false;
+        modeM2 = false;
+        modeM3 = false;
+
+        // klik kiri
+        if(button == GLUT_LEFT_BUTTON)
+        {
+            modeM1 = true;
+        }
+
+        // klik tengah
+        else if(button == GLUT_MIDDLE_BUTTON)
+        {
+            modeM2 = true;
+        }
+
+        // klik kanan
+        else if(button == GLUT_RIGHT_BUTTON)
+        {
+            modeM3 = true;
+        }
+    }
 }
 
 // Main program
@@ -409,8 +756,14 @@ int main(int argc, char *argv[])
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
 
+    //31
+    glutMouseFunc(mouse);
+
     // Setup OpenGL
     myinit();
+
+    //32
+    glutTimerFunc(16, updateAnimation, 0);
 
     // Loop utama
     glutMainLoop();
