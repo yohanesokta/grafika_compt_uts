@@ -16,6 +16,7 @@
 #include <cmath>
 #include <stdio.h>
 #include <time.h>
+
 Maze maze;
 
 struct movement {
@@ -37,35 +38,33 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    // Tighter ortho to make maze larger
     glOrtho(-20, 20, -20, 20, -100, 100);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     glRotatef(rotationX, 1, 0, 0);
-    glRotatef(rotationY, 0, 1, 0);
-    // Center the maze and shift to account for negative Z mapping
+    glRotatef(rotationZ, 0, 0, 1);
     glTranslatef(-WIDTH * CELL_SIZE / 2.0, 0, HEIGHT * CELL_SIZE / 2.0);
 
     // Floor (Blue transparent 0.4)
-    glColor4f(0.0, 0.0, 1.0, 0.4);
-    draw_3d_kotak(0, -0.05, -HEIGHT * CELL_SIZE, WIDTH * CELL_SIZE, 0, 0, 0.4);
+    draw_3d_kotak(0, -0.05, -HEIGHT * CELL_SIZE, WIDTH * CELL_SIZE, 0, 0,
+                  0.0f, 0.0f, 1.0f, 0.4f);
 
     // Maze
-    glColor3f(0.1, 0.0, 1.0);
     for (int y = 0; y < HEIGHT; y++) {
       for (int x = 0; x < WIDTH; x++) {
         if (maze.grid[y][x].wall) {
-          draw_3d_kotak(maze.grid[y][x].x1, 0, -maze.grid[y][x].y2, 
-                        maze.grid[y][x].x2, CELL_SIZE, -maze.grid[y][x].y1);
+          draw_3d_kotak(maze.grid[y][x].x1, 0, -maze.grid[y][x].y2,
+                        maze.grid[y][x].x2, CELL_SIZE, -maze.grid[y][x].y1,
+                        0.1f, 0.0f, 1.0f, 1.0f);
         }
       }
     }
 
     // Player (Red)
-    glColor3f(1.0, 0.0, 0.0);
-    draw_3d_kotak(player.x * CELL_SIZE, 0.01, -(player.y + 1) * CELL_SIZE, 
-                  (player.x + 1) * CELL_SIZE, CELL_SIZE, -player.y * CELL_SIZE);
+    draw_3d_kotak(player.x * CELL_SIZE, 0.01, -(player.y + 1) * CELL_SIZE,
+                  (player.x + 1) * CELL_SIZE, CELL_SIZE, -player.y * CELL_SIZE,
+                  1.0f, 0.0f, 0.0f, 1.0f);
 
     // NIM (Animated) - Centered vertically
     float baseX = c_nim.x * CELL_SIZE + CELL_SIZE / 2.0;
@@ -73,7 +72,6 @@ void display() {
     glPushMatrix();
     glTranslatef(baseX, CELL_SIZE / 2.0, -baseZ);
     glRotatef(nimRotation, 0, 1, 0);
-    glColor3f(0.0, 0.0, 0.0);
     drawNIM(0, 0, 0, 0.35, true);
     glPopMatrix();
 
@@ -196,7 +194,7 @@ void keyboard(unsigned char key, int x, int y) {
   case 'j':
   case 'J':
     if (view3D) {
-      rotationY -= 5.0f;
+      rotationZ -= 5.0f;
       display();
     }
     break;
@@ -204,7 +202,7 @@ void keyboard(unsigned char key, int x, int y) {
   case 'l':
   case 'L':
     if (view3D) {
-      rotationY += 5.0f;
+      rotationZ += 5.0f;
       display();
     }
     break;
@@ -215,14 +213,12 @@ void keyboard(unsigned char key, int x, int y) {
     break;
   }
 }
-
-void timer(int value) {
-  if (view3D) {
-    nimRotation += 2.0f;
-    if (nimRotation > 360) nimRotation -= 360;
-    display();
-  }
-  glutTimerFunc(16, timer, 0);
+void idleFuction() {
+    if (view3D) {
+        nimRotation += 2.0f;
+        if (nimRotation > 360) nimRotation -= 360;
+        display();
+    }
 }
 
 float randomFloat() { return (float)rand() / RAND_MAX; }
@@ -260,7 +256,7 @@ int main(int argc, char *argv[]) {
   glutCreateWindow("OpenGL Maze Game - UTS");
   reInitMaze();
   glutKeyboardFunc(keyboard);
-  glutTimerFunc(0, timer, 0);
+  glutIdleFunc(idleFuction);
   myinit();
   glutMainLoop();
   return 0;
