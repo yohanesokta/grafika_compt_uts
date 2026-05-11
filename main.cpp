@@ -24,7 +24,6 @@ struct movement {
   float y;
 };
 
-bool initDisplay = true;
 float speed = 1.0f;
 void reInitMaze();
 
@@ -47,8 +46,10 @@ void display() {
     glTranslatef(-WIDTH * CELL_SIZE / 2.0, 0, HEIGHT * CELL_SIZE / 2.0);
 
     // Floor (Blue transparent 0.4)
+    glDepthMask(GL_FALSE); // Disable depth writing for transparency
     draw_3d_kotak(0, -0.05, -HEIGHT * CELL_SIZE, WIDTH * CELL_SIZE, 0, 0,
-                  0.0f, 0.0f, 1.0f, 0.4f);
+                  1.0f, 0.0f, 0.0f, 0.4f);
+    glDepthMask(GL_TRUE); // Re-enable depth writing
 
     // Maze
     for (int y = 0; y < HEIGHT; y++) {
@@ -242,10 +243,6 @@ void reInitMaze() {
 
   player.x = WIDTH / 2;
   player.y = HEIGHT - 1;
-  if (initDisplay) {
-    initDisplay = false;
-    glutDisplayFunc(display);
-  }
   display();
 }
 
@@ -255,6 +252,8 @@ int main(int argc, char *argv[]) {
   glutInitWindowSize(500, 500);
   glutCreateWindow("OpenGL Maze Game - UTS");
   reInitMaze();
+  glutDisplayFunc(display);
+
   glutKeyboardFunc(keyboard);
   glutIdleFunc(idleFuction);
   myinit();
