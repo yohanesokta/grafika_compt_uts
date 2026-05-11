@@ -22,6 +22,21 @@ bool is3D = false; //1
 //15
 float rotY = 45.0f; // kiri-kanan
 float rotX = 30.0f; // atas-bawah
+//29
+// ==========================
+// ANIMASI NIM 3D
+// ==========================
+float nimOffset = 0.0f;
+bool nimNaik = true;
+
+float nimRotX = 0.0f;
+float nimRotY = 0.0f;
+float nimSpin = 0.0f;
+
+// mode mouse
+bool modeM1 = false;
+bool modeM2 = false;
+bool modeM3 = false;
 
 // Struktur posisi (player & objek lain)
 struct movement
@@ -431,24 +446,63 @@ void drawDigit7Seg3D(int digit, float ox, float oy, float oz, float s)
         );
 }
 
+//30
 void drawNIM3D()
 {
     float scale = CELL_SIZE * 0.18f;
     float gap   = CELL_SIZE * 0.30f;
 
-    // total panjang 3 digit
-    float totalWidth = gap * 2 + scale;
+    // ukuran total nim
+    float totalWidth  = gap * 2 + scale;
+    float totalHeight = scale * 2.0f;
+    float totalDepth  = scale * 0.2f;
 
-    // posisi tengah cell maze
-    float x = c_nim.x * CELL_SIZE + CELL_SIZE/2 - totalWidth/2;
-    float z = c_nim.y * CELL_SIZE + CELL_SIZE/2 - scale;
+    // posisi nim di maze
+    float baseX = c_nim.x * CELL_SIZE + CELL_SIZE/2 - totalWidth/2;
+    float baseY = 1.0f;
+    float baseZ = c_nim.y * CELL_SIZE + CELL_SIZE/2 - totalHeight/2;
 
-    // sedikit di atas lantai
-    float y = 1.0f;
+    // pusat objek NIM
+    float centerX = totalWidth  / 2.0f;
+    float centerY = totalDepth  / 2.0f;
+    float centerZ = totalHeight / 2.0f;
 
-    drawDigit7Seg3D(0, x, y, z, scale);
-    drawDigit7Seg3D(7, x + gap, y, z, scale);
-    drawDigit7Seg3D(6, x + gap * 2, y, z, scale);
+    glPushMatrix();
+
+    // pindah ke posisi nim
+    glTranslatef(baseX, baseY, baseZ);
+
+    // pindah ke tengah nim
+    glTranslatef(centerX, centerY, centerZ);
+
+    // ROTASI DI TENGAH
+    glRotatef(nimRotY, 0.0f, 1.0f, 0.0f);
+    glRotatef(nimRotX, 1.0f, 0.0f, 0.0f);
+    glRotatef(nimSpin, 0.0f, 0.0f, 1.0f);
+
+    // balik lagi
+    glTranslatef(-centerX, -centerY, -centerZ);
+
+    // gambar nim
+    drawDigit7Seg3D(0, 0, 0, 0, scale);
+
+    drawDigit7Seg3D(
+        7,
+        gap,
+        0,
+        0,
+        scale
+    );
+
+    drawDigit7Seg3D(
+        6,
+        gap * 2,
+        0,
+        0,
+        scale
+    );
+
+    glPopMatrix();
 }
 
 
@@ -574,6 +628,44 @@ float randomFloat() {
     return (float)rand() / RAND_MAX;
 }
 
+//30
+
+void updateAnimation(int value)
+{
+    // gerakan naik turun otomatis
+    if (nimNaik)
+        nimOffset += 0.05f;
+    else
+        nimOffset -= 0.05f;
+
+    if (nimOffset > 2.0f)
+        nimNaik = false;
+
+    if (nimOffset < -2.0f)
+        nimNaik = true;
+
+    // =========================
+    // M1 = ROTASI X
+    // =========================
+    if (modeM1)
+        nimRotX += 2.0f;
+
+    // =========================
+    // M2 = ROTASI Y
+    // =========================
+    if (modeM2)
+        nimRotY += 2.0f;
+
+    // =========================
+    // M3 = ROTASI Z
+    // =========================
+    if (modeM3)
+        nimSpin += 3.0f;
+
+    glutPostRedisplay();
+    glutTimerFunc(16, updateAnimation, 0);
+}
+
 // Generate ulang maze + reset posisi
 void reInitMaze(){
     srand(time(NULL));
@@ -609,6 +701,36 @@ void reInitMaze(){
     glutPostRedisplay();
 }
 
+//31
+void mouse(int button, int state, int x, int y)
+{
+    if(state == GLUT_DOWN)
+    {
+        // reset dulu
+        modeM1 = false;
+        modeM2 = false;
+        modeM3 = false;
+
+        // klik kiri
+        if(button == GLUT_LEFT_BUTTON)
+        {
+            modeM1 = true;
+        }
+
+        // klik tengah
+        else if(button == GLUT_MIDDLE_BUTTON)
+        {
+            modeM2 = true;
+        }
+
+        // klik kanan
+        else if(button == GLUT_RIGHT_BUTTON)
+        {
+            modeM3 = true;
+        }
+    }
+}
+
 // Main program
 int main(int argc, char *argv[])
 {
@@ -634,8 +756,14 @@ int main(int argc, char *argv[])
     glutDisplayFunc(display);
     glutKeyboardFunc(keyboard);
 
+    //31
+    glutMouseFunc(mouse);
+
     // Setup OpenGL
     myinit();
+
+    //32
+    glutTimerFunc(16, updateAnimation, 0);
 
     // Loop utama
     glutMainLoop();
