@@ -1,0 +1,3 @@
+/home/yohanesokta/Documents/GitHub/grafika_compt_uts/build/CMakeFiles/main.dir
+/home/yohanesokta/Documents/GitHub/grafika_compt_uts/build/CMakeFiles/edit_cache.dir
+/home/yohanesokta/Documents/GitHub/grafika_compt_uts/build/CMakeFiles/rebuild_cache.dir
