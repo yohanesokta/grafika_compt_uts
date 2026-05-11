@@ -10,6 +10,7 @@ find_package(GLUT REQUIRED)
 add_executable(main
     main.cpp
     maze.cpp
+    demo3.cpp
 )
 
 target_include_directories(main PRIVATE src)
