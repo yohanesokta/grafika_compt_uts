@@ -11,210 +11,186 @@
 #include <GL/glut.h>
 #endif
 
-#include <time.h>
 #include "maze.h"
+#include <cmath>
 #include <stdio.h>
-
+#include <time.h>
 Maze maze;
 
-
-struct movement
-{
-    float x;
-    float y;
+struct movement {
+  float x;
+  float y;
 };
 
 bool initDisplay = true;
-
-
+float speed = 1.0f;
 void reInitMaze();
 
+movement player{(float)(WIDTH / 2), (float)(HEIGHT - 1)};
 
-movement player {(float)(WIDTH/2), (float)(HEIGHT-1)};
+movement c_nim{1.0, 1.0};
 
+void display() {
+  glClear(GL_COLOR_BUFFER_BIT);
 
-movement c_nim {1.0,1.0};
+  glColor3f(0.1, 0.0, 1.0);
 
-
-void display()
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-
-
-    glColor3f(0.1, 0.0, 1.0);
-
-
-    for (int y = 0; y < HEIGHT; y++)
-    {
-        for (int x = 0; x < WIDTH; x++)
-        {
-            if (maze.grid[y][x].wall)
-            {
-                glRecti(
-                    maze.grid[y][x].x1,
-                    maze.grid[y][x].y1,
-                    maze.grid[y][x].x2,
-                    maze.grid[y][x].y2);
-            }
-        }
+  for (int y = 0; y < HEIGHT; y++) {
+    for (int x = 0; x < WIDTH; x++) {
+      if (maze.grid[y][x].wall) {
+        glRecti(maze.grid[y][x].x1, maze.grid[y][x].y1, maze.grid[y][x].x2,
+                maze.grid[y][x].y2);
+      }
     }
+  }
 
-    glColor3f(0.0,0.0,0.0);
+  glColor3f(0.0, 0.0, 0.0);
 
-    float scale = 0.5;
+  float scale = 0.5;
 
-    float baseX = c_nim.x * CELL_SIZE + CELL_SIZE/2;
-    float baseY = c_nim.y * CELL_SIZE + CELL_SIZE/2;
+  float baseX = c_nim.x * CELL_SIZE + CELL_SIZE / 2;
+  float baseY = c_nim.y * CELL_SIZE + CELL_SIZE / 2;
 
-    glRectf(baseX + (-1.8)*scale, baseY + (1.6)*scale, baseX + (-1.0)*scale, baseY + (1.8)*scale);
-    glRectf(baseX + (-1.8)*scale, baseY + (-1.8)*scale, baseX + (-1.0)*scale, baseY + (-1.6)*scale);
-    glRectf(baseX + (-1.8)*scale, baseY + (-1.6)*scale, baseX + (-1.6)*scale, baseY + (1.6)*scale);
-    glRectf(baseX + (-1.2)*scale, baseY + (-1.6)*scale, baseX + (-1.0)*scale, baseY + (1.6)*scale);
+  glRectf(baseX + (-1.8) * scale, baseY + (1.6) * scale, baseX + (-1.0) * scale,
+          baseY + (1.8) * scale);
+  glRectf(baseX + (-1.8) * scale, baseY + (-1.8) * scale,
+          baseX + (-1.0) * scale, baseY + (-1.6) * scale);
+  glRectf(baseX + (-1.8) * scale, baseY + (-1.6) * scale,
+          baseX + (-1.6) * scale, baseY + (1.6) * scale);
+  glRectf(baseX + (-1.2) * scale, baseY + (-1.6) * scale,
+          baseX + (-1.0) * scale, baseY + (1.6) * scale);
 
-    glRectf(baseX + (-0.8)*scale, baseY + (1.6)*scale, baseX + (0.6)*scale, baseY + (1.8)*scale);
-    glRectf(baseX + (0.4)*scale, baseY + (-1.8)*scale, baseX + (0.6)*scale, baseY + (1.6)*scale);
+  glRectf(baseX + (-0.8) * scale, baseY + (1.6) * scale, baseX + (0.6) * scale,
+          baseY + (1.8) * scale);
+  glRectf(baseX + (0.4) * scale, baseY + (-1.8) * scale, baseX + (0.6) * scale,
+          baseY + (1.6) * scale);
 
-    glRectf(baseX + (0.8)*scale, baseY + (1.6)*scale, baseX + (1.8)*scale, baseY + (1.8)*scale);
-    glRectf(baseX + (0.8)*scale, baseY + (-1.8)*scale, baseX + (1.0)*scale, baseY + (1.6)*scale);
-    glRectf(baseX + (1.0)*scale, baseY + (-1.8)*scale, baseX + (1.8)*scale, baseY + (-1.6)*scale);
-    glRectf(baseX + (1.6)*scale, baseY + (-1.6)*scale, baseX + (1.8)*scale, baseY + (0.0)*scale);
-    glRectf(baseX + (1.0)*scale, baseY + (-0.2)*scale, baseX + (1.6)*scale, baseY + (0.0)*scale);
+  glRectf(baseX + (0.8) * scale, baseY + (1.6) * scale, baseX + (1.8) * scale,
+          baseY + (1.8) * scale);
+  glRectf(baseX + (0.8) * scale, baseY + (-1.8) * scale, baseX + (1.0) * scale,
+          baseY + (1.6) * scale);
+  glRectf(baseX + (1.0) * scale, baseY + (-1.8) * scale, baseX + (1.8) * scale,
+          baseY + (-1.6) * scale);
+  glRectf(baseX + (1.6) * scale, baseY + (-1.6) * scale, baseX + (1.8) * scale,
+          baseY + (0.0) * scale);
+  glRectf(baseX + (1.0) * scale, baseY + (-0.2) * scale, baseX + (1.6) * scale,
+          baseY + (0.0) * scale);
 
-    glColor3f(1.0, 0.0, 0.0);
+  glColor3f(1.0, 0.0, 0.0);
 
-    glRectf(player.x * CELL_SIZE, player.y * CELL_SIZE,(player.x + 1) * CELL_SIZE, (player.y + 1) * CELL_SIZE);
+  glRectf(player.x * CELL_SIZE, player.y * CELL_SIZE,
+          (player.x + 1) * CELL_SIZE, (player.y + 1) * CELL_SIZE);
 
-    glFlush();
+  glFlush();
 }
 
+void myinit() {
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-void myinit()
-{
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable(GL_POLYGON_SMOOTH);
+  glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
 
-    glEnable(GL_POLYGON_SMOOTH);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluOrtho2D(0, WIDTH * CELL_SIZE, 0, HEIGHT * CELL_SIZE);
 
+  glMatrixMode(GL_MODELVIEW);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluOrtho2D(0, WIDTH * CELL_SIZE, 0, HEIGHT * CELL_SIZE);
-
-    glMatrixMode(GL_MODELVIEW);
-
-
-    glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClearColor(1.0, 1.0, 1.0, 1.0);
 }
 
+bool checkCollision(float newX, float newY) {
+  int gridX = (int)floor(newX);
+  int gridY = (int)floor(newY);
+
+  // batas map
+  if (gridX < 0 || gridX >= WIDTH || gridY < 0 || gridY >= HEIGHT) {
+    return true;
+  }
+
+  return maze.grid[gridY][gridX].wall;
+}
 
 void movement_handler(float dx, float dy) {
+  float newX = player.x + dx;
+  float newY = player.y + dy;
+  if (!checkCollision(newX, newY)) {
     player.x += dx;
     player.y += dy;
+  }
 
-
-    glutDisplayFunc(display);
-    glutPostRedisplay();
+  glutDisplayFunc(display);
+  glutPostRedisplay();
 }
-
-float speed = 0.2f;
 
 const int KEY_ESC = 27;
 
-void keyboard(unsigned char key, int x, int y)
-{
-    printf("nilai key %d\n",key);
-    if (key == KEY_ESC) {
-        exit(0);
-    }
-    switch (key)
-    {
-    case 'w':
-        movement_handler(0,speed);
-        break;
+void keyboard(unsigned char key, int x, int y) {
+  printf("nilai key %d\n", key);
+  if (key == KEY_ESC) {
+    exit(0);
+  }
+  switch (key) {
+  case 'w':
+    movement_handler(0, speed);
+    break;
 
-    case 'a':
-        movement_handler(-speed,0);
-        break;
+  case 'a':
+    movement_handler(-speed, 0);
+    break;
 
-    case 's':
-        movement_handler(0,-speed);
-        break;
+  case 's':
+    movement_handler(0, -speed);
+    break;
 
-    case 'd':
-        movement_handler(speed,0);
-        break;
+  case 'd':
+    movement_handler(speed, 0);
+    break;
 
-    case 'c':
-    case 'C':
-        reInitMaze();
-        break;
-    }
-}
-
-float randomFloat() {
-    return (float)rand() / RAND_MAX;
-}
-
-
-void reInitMaze(){
-    srand(time(NULL));
-
-    initMaze(&maze);
-    divide(&maze, 0, 0, WIDTH, HEIGHT);
-
-    int x,y;
-
-
-    do{
-        x = rand() % WIDTH;
-        y = rand() % HEIGHT;
-    }
-    while(
-        maze.grid[y][x].wall ||
-        x == 0 || x == WIDTH-1 ||
-        y == 0 || y == HEIGHT-1
-    );
-
-
-    c_nim.x = x;
-    c_nim.y = y;
-
-
-    player.x = WIDTH / 2;
-    player.y = HEIGHT - 1;
-    if (initDisplay) {
-        initDisplay = false;
-        glutDisplayFunc(display);
-    }
-    glutPostRedisplay();
-}
-
-
-int main(int argc, char *argv[])
-{
-    glutInit(&argc, argv);
-
-
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-
-
-    glutInitWindowSize(500, 500);
-
-
-    glutCreateWindow("OpenGL Maze Game - UTS");
-
-
+  case 'c':
+  case 'C':
     reInitMaze();
+    break;
+  }
+}
 
+float randomFloat() { return (float)rand() / RAND_MAX; }
 
-    glutKeyboardFunc(keyboard);
+void reInitMaze() {
+  srand(time(NULL));
 
+  initMaze(&maze);
+  divide(&maze, 0, 0, WIDTH, HEIGHT);
 
-    myinit();
+  int x, y;
 
+  do {
+    x = rand() % WIDTH;
+    y = rand() % HEIGHT;
+  } while (maze.grid[y][x].wall || x == 0 || x == WIDTH - 1 || y == 0 ||
+           y == HEIGHT - 1);
 
-    glutMainLoop();
+  c_nim.x = x;
+  c_nim.y = y;
 
-    return 0;
+  player.x = WIDTH / 2;
+  player.y = HEIGHT - 1;
+  if (initDisplay) {
+    initDisplay = false;
+    glutDisplayFunc(display);
+  }
+  glutPostRedisplay();
+}
+
+int main(int argc, char *argv[]) {
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+  glutInitWindowSize(500, 500);
+  glutCreateWindow("OpenGL Maze Game - UTS");
+  reInitMaze();
+  glutKeyboardFunc(keyboard);
+  myinit();
+  glutMainLoop();
+  return 0;
 }
