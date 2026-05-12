@@ -48,11 +48,6 @@ void display() {
     glRotatef(rotationZ, 0, 0, 1);
     glTranslatef(-WIDTH * CELL_SIZE / 2.0, 0, HEIGHT * CELL_SIZE / 2.0);
 
-    // Floor (Blue transparent 0.4)
-    // glDepthMask(GL_FALSE); // Disable depth writing for transparency
-    draw_3d_kotak(0, -0.05, -HEIGHT * CELL_SIZE, WIDTH * CELL_SIZE, -0.05, 0,
-                  1.0f, 0.0f, 0.0f, 0.6f);
-    // glDepthMask(GL_TRUE); // Re-enable depth writing
     // Maze
     for (int y = 0; y < HEIGHT; y++) {
       for (int x = 0; x < WIDTH; x++) {
@@ -77,6 +72,15 @@ void display() {
     glRotatef(nimRotation, nim3angle[0], nim3angle[1], nim3angle[2]);
     drawNIM(0, 0, 0, 0.35, true);
     glPopMatrix();
+
+    // Floor (Blue transparent 0.4) - Drawn last for proper blending
+    // We draw it slightly below 0 to avoid Z-fighting with walls
+    glDepthMask(GL_FALSE);
+    glColor4f(0.0f, 0.0f, 1.0f, 0.5f); // Natural blueish floor
+    // Floor matches maze dimensions exactly
+    draw_persegi(0, -0.01, 0, WIDTH * CELL_SIZE, -0.01, 0, WIDTH * CELL_SIZE,
+                 -0.01, -HEIGHT * CELL_SIZE, 0, -0.01, -HEIGHT * CELL_SIZE);
+    glDepthMask(GL_TRUE);
 
   } else {
     glDisable(GL_DEPTH_TEST);
@@ -271,7 +275,7 @@ void mouse_handler(int button, int state, int x, int y) {
 
 int main(int argc, char *argv[]) {
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA | GLUT_DEPTH);
   glutInitWindowSize(500, 500);
   glutCreateWindow("OpenGL Maze Game - UTS");
   reInitMaze();
