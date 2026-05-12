@@ -1,3 +1,5 @@
+#include <GL/freeglut_std.h>
+#include <GL/gl.h>
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -11,13 +13,14 @@
 #include <GL/glut.h>
 #endif
 
-#include "maze.h"
 #include "demo3.h"
+#include "maze.h"
 #include <cmath>
 #include <stdio.h>
 #include <time.h>
 
 Maze maze;
+int nim3angle[3] = {1, 0, 0};
 
 struct movement {
   float x;
@@ -46,11 +49,10 @@ void display() {
     glTranslatef(-WIDTH * CELL_SIZE / 2.0, 0, HEIGHT * CELL_SIZE / 2.0);
 
     // Floor (Blue transparent 0.4)
-    glDepthMask(GL_FALSE); // Disable depth writing for transparency
-    draw_3d_kotak(0, -0.05, -HEIGHT * CELL_SIZE, WIDTH * CELL_SIZE, 0, 0,
-                  1.0f, 0.0f, 0.0f, 0.4f);
-    glDepthMask(GL_TRUE); // Re-enable depth writing
-
+    // glDepthMask(GL_FALSE); // Disable depth writing for transparency
+    draw_3d_kotak(0, -0.05, -HEIGHT * CELL_SIZE, WIDTH * CELL_SIZE, -0.05, 0,
+                  1.0f, 0.0f, 0.0f, 0.6f);
+    // glDepthMask(GL_TRUE); // Re-enable depth writing
     // Maze
     for (int y = 0; y < HEIGHT; y++) {
       for (int x = 0; x < WIDTH; x++) {
@@ -72,7 +74,7 @@ void display() {
     float baseZ = c_nim.y * CELL_SIZE + CELL_SIZE / 2.0;
     glPushMatrix();
     glTranslatef(baseX, CELL_SIZE / 2.0, -baseZ);
-    glRotatef(nimRotation, 0, 1, 0);
+    glRotatef(nimRotation, nim3angle[0], nim3angle[1], nim3angle[2]);
     drawNIM(0, 0, 0, 0.35, true);
     glPopMatrix();
 
@@ -215,11 +217,12 @@ void keyboard(unsigned char key, int x, int y) {
   }
 }
 void idleFuction() {
-    if (view3D) {
-        nimRotation += 2.0f;
-        if (nimRotation > 360) nimRotation -= 360;
-        display();
-    }
+  if (view3D) {
+    nimRotation += 2.0f;
+    if (nimRotation > 360)
+      nimRotation -= 360;
+    display();
+  }
 }
 
 float randomFloat() { return (float)rand() / RAND_MAX; }
@@ -246,14 +249,34 @@ void reInitMaze() {
   display();
 }
 
+void mouse_handler(int button, int state, int x, int y) {
+  switch (button) {
+  case GLUT_LEFT_BUTTON:
+    nim3angle[0] = 1;
+    nim3angle[1] = 0;
+    nim3angle[2] = 0;
+    break;
+  case GLUT_RIGHT_BUTTON:
+    nim3angle[0] = 0;
+    nim3angle[1] = 1;
+    nim3angle[2] = 0;
+    break;
+  case GLUT_MIDDLE_BUTTON:
+    nim3angle[0] = 0;
+    nim3angle[1] = 0;
+    nim3angle[2] = 1;
+    break;
+  }
+}
+
 int main(int argc, char *argv[]) {
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_ALPHA);
   glutInitWindowSize(500, 500);
   glutCreateWindow("OpenGL Maze Game - UTS");
   reInitMaze();
   glutDisplayFunc(display);
-
+  glutMouseFunc(mouse_handler);
   glutKeyboardFunc(keyboard);
   glutIdleFunc(idleFuction);
   myinit();
