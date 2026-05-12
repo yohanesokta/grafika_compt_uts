@@ -15,12 +15,11 @@
 
 #include "demo3.h"
 #include "maze.h"
-#include <cmath>
 #include <stdio.h>
 #include <time.h>
 
 Maze maze;
-int nim3angle[3] = {1, 0, 0};
+int nim3angle[3] = {0, 0, 1};
 
 struct movement {
   float x;
@@ -48,7 +47,7 @@ void display() {
     glRotatef(rotationZ, 0, 0, 1);
     glTranslatef(-WIDTH * CELL_SIZE / 2.0, 0, HEIGHT * CELL_SIZE / 2.0);
 
-    // Maze
+    // maze
     for (int y = 0; y < HEIGHT; y++) {
       for (int x = 0; x < WIDTH; x++) {
         if (maze.grid[y][x].wall) {
@@ -59,12 +58,12 @@ void display() {
       }
     }
 
-    // Player (Red)
+    // player
     draw_3d_kotak(player.x * CELL_SIZE, 0.01, -(player.y + 1) * CELL_SIZE,
                   (player.x + 1) * CELL_SIZE, CELL_SIZE, -player.y * CELL_SIZE,
                   1.0f, 0.0f, 0.0f, 1.0f);
 
-    // NIM (Animated) - Centered vertically
+    // nim
     float baseX = c_nim.x * CELL_SIZE + CELL_SIZE / 2.0;
     float baseZ = c_nim.y * CELL_SIZE + CELL_SIZE / 2.0;
     glPushMatrix();
@@ -73,11 +72,9 @@ void display() {
     drawNIM(0, 0, 0, 0.35, true);
     glPopMatrix();
 
-    // Floor (Blue transparent 0.4) - Drawn last for proper blending
-    // We draw it slightly below 0 to avoid Z-fighting with walls
+    // floor
     glDepthMask(GL_FALSE);
-    glColor4f(0.0f, 0.0f, 1.0f, 0.5f); // Natural blueish floor
-    // Floor matches maze dimensions exactly
+    glColor4f(0.0f, 0.0f, 1.0f, 0.5f);
     draw_persegi(0, -0.01, 0, WIDTH * CELL_SIZE, -0.01, 0, WIDTH * CELL_SIZE,
                  -0.01, -HEIGHT * CELL_SIZE, 0, -0.01, -HEIGHT * CELL_SIZE);
     glDepthMask(GL_TRUE);
@@ -131,10 +128,10 @@ void myinit() {
 }
 
 bool checkCollision(float newX, float newY) {
-  int gridX = (int)floor(newX);
-  int gridY = (int)floor(newY);
+  int gridX = (int)newX;
+  int gridY = (int)newY;
 
-  // batas map
+  // limit
   if (gridX < 0 || gridX >= WIDTH || gridY < 0 || gridY >= HEIGHT) {
     return true;
   }
