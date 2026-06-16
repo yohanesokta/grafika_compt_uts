@@ -19,26 +19,32 @@ void draw_persegi(float x1, float y1, float z1,
 
 void draw_3d_kotak(float x1, float y1, float z1, float x2, float y2, float z2, float r, float g, float b, float alpha) {
     // Top face
+    glNormal3f(0.0f, 1.0f, 0.0f);
     glColor4f(r * 1.0f, g * 1.0f, b * 1.0f, alpha);
     draw_persegi(x1, y2, z1, x1, y2, z2, x2, y2, z2, x2, y2, z1);
 
     // Bottom face
+    glNormal3f(0.0f, -1.0f, 0.0f);
     glColor4f(r * 0.4f, g * 0.4f, b * 0.4f, alpha);
     draw_persegi(x1, y1, z1, x2, y1, z1, x2, y1, z2, x1, y1, z2);
 
     // Front face
+    glNormal3f(0.0f, 0.0f, 1.0f);
     glColor4f(r * 0.8f, g * 0.8f, b * 0.8f, alpha);
     draw_persegi(x1, y1, z2, x2, y1, z2, x2, y2, z2, x1, y2, z2);
 
     // Back face
+    glNormal3f(0.0f, 0.0f, -1.0f);
     glColor4f(r * 0.6f, g * 0.6f, b * 0.6f, alpha);
     draw_persegi(x1, y1, z1, x1, y2, z1, x2, y2, z1, x2, y1, z1);
 
     // Left face
+    glNormal3f(-1.0f, 0.0f, 0.0f);
     glColor4f(r * 0.7f, g * 0.7f, b * 0.7f, alpha);
     draw_persegi(x1, y1, z1, x1, y1, z2, x1, y2, z2, x1, y2, z1);
 
     // Right face
+    glNormal3f(1.0f, 0.0f, 0.0f);
     glColor4f(r * 0.5f, g * 0.5f, b * 0.5f, alpha);
     draw_persegi(x2, y1, z1, x2, y2, z1, x2, y2, z2, x2, y1, z2);
 }
