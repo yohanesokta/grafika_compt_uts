@@ -1,8 +1,8 @@
-#include <GL/freeglut_std.h>
 #include <GL/gl.h>
 #ifdef _WIN32
 #include <windows.h>
 #else
+#include <cstdlib>
 #include <unistd.h>
 #endif
 
@@ -23,6 +23,7 @@
 
 Maze maze;
 int nim3angle[3] = {0, 0, 1};
+bool state_colosion_nrp = 1;
 
 struct movement {
   float x;
@@ -31,9 +32,7 @@ struct movement {
 
 float speed = 1.0f;
 void reInitMaze();
-
 movement player{(float)(WIDTH / 2), (float)(HEIGHT - 1)};
-
 movement c_nim{1.0, 1.0};
 
 int viewMode = 0;
@@ -42,13 +41,14 @@ int maze_rotation_y = 0;
 int winWidth = 500;
 int winHeight = 500;
 
-float pos[3] = {0.0, 0.0, -15.0};
+float pos[3] = {0.0, 0.0, -18.0};
 float viewdir[3] = {0.0, 0.0, 2};
 int specialKey[1024];
 int isNight = 0;
 int ambientOn = 1;
 int diffuseOn = 1;
 int specularOn = 1;
+float alpha_dinding = 1.0f;
 
 void special_down_handle(int key, int x, int y) { specialKey[key] = 1; }
 void special_up_handle(int key, int x, int y) { specialKey[key] = 0; }
@@ -79,7 +79,7 @@ void reshape(int width, int height) {
 }
 
 void display() {
-  GLfloat amb[4], diff[4], spec[4];
+  float amb[4], diff[4], spec[4];
 
   if (isNight) {
     glClearColor(0.05, 0.05, 0.1, 1.0);
@@ -93,9 +93,10 @@ void display() {
     for (int i = 0; i < 3; i++) {
       amb[i] = 0.3f;
       diff[i] = 1.0f;
-      spec[i] = 1.0f;
+      spec[i] = 33.0f;
     }
   }
+
   amb[3] = diff[3] = spec[3] = 1.0f;
 
   if (!ambientOn) {
@@ -107,15 +108,14 @@ void display() {
   if (!specularOn) {
     spec[0] = spec[1] = spec[2] = 0.0f;
   }
-
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, amb);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, diff);
-  glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
 
+  glLightfv(GL_LIGHT0, GL_SPECULAR, spec);
   glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glLoadIdentity();
 
+  glLoadIdentity();
   if (viewMode == 2) {
     gluLookAt(pos[0], pos[1], pos[2], pos[0] + viewdir[0], pos[1] + viewdir[1],
               pos[2] + viewdir[2], 0.0, 1.0, 0.0);
@@ -124,18 +124,24 @@ void display() {
   glRotatef(maze_rotation_x, 0, 1, 0);
   glRotatef(maze_rotation_y, 1, 0, 0);
   glTranslatef(-WIDTH * CELL_SIZE / 2.0, -HEIGHT * CELL_SIZE / 2.0, 0.0);
-
   // maze
+  //
+  //
+  if (alpha_dinding != 1.0f) {
+    glEnable(GL_BLEND);
+  }
   for (int y = 0; y < HEIGHT; y++) {
     for (int x = 0; x < WIDTH; x++) {
       if (maze.grid[y][x].wall) {
         draw_3d_kotak(maze.grid[y][x].x1, maze.grid[y][x].y1, -CELL_SIZE / 2.0,
                       maze.grid[y][x].x2, maze.grid[y][x].y2, CELL_SIZE / 2.0,
-                      0.1f, 0.0f, 1.0f, 1.0f);
+                      0.1f, 0.0f, 1.0f, alpha_dinding);
       }
     }
   }
-
+  if (alpha_dinding != 1.0f) {
+    glDisable(GL_BLEND);
+  }
   // player
   draw_3d_kotak(player.x * CELL_SIZE + 0.2f, player.y * CELL_SIZE + 0.2f,
                 -CELL_SIZE / 2.0 + 0.2f, (player.x + 1) * CELL_SIZE - 0.2f,
@@ -213,7 +219,16 @@ bool checkCollision(float newX, float newY) {
 void movement_handler(float dx, float dy) {
   float newX = player.x + dx;
   float newY = player.y + dy;
+
   if (!checkCollision(newX, newY)) {
+    if (state_colosion_nrp) {
+      if (newX == c_nim.x && newY == c_nim.y) {
+        state_colosion_nrp = false;
+        std::system("notify-send 'Notification' 'Player Menyentuh Nim'");
+        display();
+        return;
+      }
+    }
     player.x += dx;
     player.y += dy;
   }
@@ -223,11 +238,16 @@ void movement_handler(float dx, float dy) {
 const int KEY_ESC = 27;
 
 void keyboard(unsigned char key, int x, int y) {
-  printf("nilai key %d\n", key);
   if (key == KEY_ESC) {
     exit(0);
   }
   switch (key) {
+  case '5':
+    if (alpha_dinding == 1.0f) {
+      alpha_dinding = 0.5f;
+    } else {
+      alpha_dinding = 1.0f;
+    }
   case '1':
     ambientOn = !ambientOn;
     display();
@@ -318,10 +338,6 @@ void keyboard(unsigned char key, int x, int y) {
   case 'c':
   case 'C':
     reInitMaze();
-    break;
-  case 'h':
-    printf("pos :\n%f x %f x %f \n\n viewdir : \nn%f x %f x %f \n", pos[0],
-           pos[1], pos[2], viewdir[0], viewdir[1], viewdir[2]);
     break;
   }
 }
