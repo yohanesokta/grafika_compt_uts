@@ -1,3 +1,3 @@
-bin/*
-!bin/*.dll
+*.exe
+obj
 build
