@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Maze
-Exec=main
-Icon=maze
-Categories=Game;
-Terminal=false
